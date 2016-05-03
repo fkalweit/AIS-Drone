@@ -1,5 +1,7 @@
 var Cylon = require('cylon');
 
+var started = false;
+
 var d = Cylon.robot({
   connections: {
     bebop: { adaptor: 'bebop' }
@@ -21,7 +23,10 @@ var d = Cylon.robot({
 // Ermöglicht Aufruf der Drohne in anderen Modulen.
 module.exports = {
   getAndActivateDrone: function () {
-    d.start()
+    if(!started){
+      d.start();
+      started = true;
+    }
     return d;
   }
 };
