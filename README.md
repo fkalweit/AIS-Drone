@@ -15,7 +15,8 @@ var d = Drone.getAndActivateDrone();
 
 drone.js:
 
-```javascriptmodule.exports = {
+```javascript 
+module.exports = {
   getAndActivateDrone: function () {
     d.start();
     return d;
