@@ -7,8 +7,10 @@ Die Node Anwendung ist Komponentenweise aufgebaut. Um eine Komponente in einer a
 Beispiel:
 
 keyboard.js
+
 `
 require('./drone');
+
 var d = Drone.getAndActivateDrone();
 `
 
@@ -16,9 +18,13 @@ drone.js
 
 `
 module.exports = {
+  
   getAndActivateDrone: function () {
+
     d.start()
+
     return d;
   }
+
 };
 `
