@@ -18,7 +18,10 @@ drone.js:
 ```javascript 
 module.exports = {
   getAndActivateDrone: function () {
-    d.start();
+    if(!started){
+      d.start();
+      started = true;
+    }
     return d;
   }
 };
