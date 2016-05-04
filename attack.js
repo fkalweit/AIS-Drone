@@ -1,3 +1,10 @@
+/*
+WARNUNG !!!!!!!!
+NICHT MIT DEM XBOX-CONTROLLER AUSFÜHREN!!!
+DORT IST DIE LINKE SCHULTERTASTE EINE ACHSE...
+EINMAL DRAUFGEDRÜCKT UND DIE DROHNE STEIGT PERMAMENT... UNAUFHALTSAM...
+*/
+
 
 /* Ermöglicht Zugriff auf den Drohnenroboter.
 Dieser ist der Einfachheit halber immer mit 'r' benannt.
