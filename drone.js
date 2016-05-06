@@ -1,32 +1,21 @@
-var Cylon = require('cylon');
+var Bebop = require('node-bebop');
 
-var started = false;
+var drone = Bebop.createClient();
+var connected = false;
 
-var d = Cylon.robot({
-  connections: {
-    bebop: { adaptor: 'bebop' }
-  },
-
-  devices: {
-    drone: { driver: 'bebop' }
-  },
-
-  /* work: function(my) {
-    //my.drone.takeOff();
-    //after((5).seconds(), my.drone.land);
-  }
-  */
-});
-
+drone.connect(function() {
+  connected = true;
+  console.log("Drone connected!");
+})
 
 // Export-Methoden des Moduls.
 // Ermöglicht Aufruf der Drohne in anderen Modulen.
 module.exports = {
   getAndActivateDrone: function () {
-    if(!started){
-      d.start();
-      started = true;
-    }
-    return d;
+    return drone;
+  },
+
+  isConnected: function (){
+    return connected;
   }
 };

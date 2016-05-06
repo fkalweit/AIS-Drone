@@ -24,53 +24,53 @@ Cylon.robot({
   work: function(k) {
     k.keyboard.on('t', function(key) {
       console.log("TAKEOFF");
-      r.drone.takeOff();
+      r.takeOff();
       //after((5).seconds(), bebop.drone.land);
     });
 
     k.keyboard.on('space', function(key) {
       console.log("EMERGENCY!");
-      r.drone.emergency();
+      r.emergency();
     });
 
     k.keyboard.on('l', function(key) {
       console.log("LAND!");
-      r.drone.land();
+      r.land();
     });
 
     k.keyboard.on('e', function(key) {
       console.log("UP");
-      r.drone.up(10);
+      r.up(10);
     });
 
     k.keyboard.on('q', function(key) {
       console.log("DOWN");
-      r.drone.down(10);
+      r.down(10);
     });
 
     k.keyboard.on('w', function(key) {
       console.log("FORWARD");
-      r.drone.forward(20);
+      r.forward(20);
     });
 
     k.keyboard.on('s', function(key) {
       console.log("BACKWARD");
-      r.drone.backward(20);
+      r.backward(20);
     });
 
     k.keyboard.on('a', function(key) {
       console.log("LEFT!");
-      r.drone.left(20);
+      r.left(20);
     });
 
     k.keyboard.on('d', function(key) {
       console.log("RIGHT!");
-      r.drone.right(20);
+      r.right(20);
     });
 
     k.keyboard.on('keyup', function(key){
       console.log("STOP -> HOVER");
-      r.drone.stop();
+      r.stop();
     });
   }
 }).start();

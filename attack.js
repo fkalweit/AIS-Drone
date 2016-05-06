@@ -12,6 +12,12 @@ Drohne ist also d.drone
 */
 var Drone = require('./drone');
 var r = Drone.getAndActivateDrone();
+r.MediaStreaming.videoEnable(1);
+
+var fs = require("fs"),
+
+var output = fs.createWriteStream("./video.h264");
+var video = r.getVideoStream();
 
 var gamepad = require("gamepad");
 
@@ -28,77 +34,126 @@ setInterval(gamepad.processEvents, 16);
 // Scan for new gamepads as a slower rate
 setInterval(gamepad.detectDevices, 500);
 
+
+if(!Drone.isConnected()){
+  console.log("No Drone-Connection");
+}
+
+
 // Listen for move events on all gamepads
 gamepad.on("move", function (id, axis, value) {
-  switch(axis){
-    case 0:
-    if(value > 0.01){
-      value = Math.round(value * 100);
-      console.log("moving right by: " + value);
-      r.drone.right(value);
-    }else if(value < -0.01){
-      value = Math.round(value * -100);
-      console.log("moving left by: " + value);
-      r.drone.left(value);
-    }else{
-      //r.drone.hover();
-    }
-    break;
-    case 1:
-    if(value > 0.01){
-      value = Math.round(value * 100);
-      console.log("moving backward by: " + value);
-      r.drone.backward(value);
-    }else if(value < -0.01){
-      value = Math.round(value * -100);
-      console.log("moving forward by: " + value);
-      r.drone.forward(value);
-    }else{
-      //r.drone.stop();
-    }
-    break;
+  if(!Drone.isConnected()){
+    console.log("No Drone-Connection");
+  }else{
+    switch(axis){
+      case 0:
+      if(value > 0.01){
+        value = Math.round(value * 100);
+        console.log("moving right by: " + value);
+        r.right(value);
+      }else if(value < -0.01){
+        value = Math.round(value * -100);
+        console.log("moving left by: " + value);
+        r.left(value);
+      }else{
+        //r.drone.hover();
+      }
+      break;
+      case 1:
+      if(value > 0.01){
+        value = Math.round(value * 100);
+        console.log("moving backward by: " + value);
+        r.backward(value);
+      }else if(value < -0.01){
+        value = Math.round(value * -100);
+        console.log("moving forward by: " + value);
+        r.forward(value);
+      }else{
+        //r.drone.stop();
+      }
+      break;
 
-    case 2:
-    if(value > 0.01){
-      value = Math.round(value * 100);
-      console.log("sinking down by: " + value);
-      r.drone.down(value);
-    }else if(value < -0.01){
-      value = Math.round(value * -100);
-      console.log("lifting up by: " + value);
-      r.drone.forward(value);
-    }else{
-      //r.drone.stop();
+      case 2:
+      if(value > 0.01){
+        value = Math.round(value * 100);
+        console.log("sinking down by: " + value);
+        r.down(value);
+      }else if(value < -0.01){
+        value = Math.round(value * -100);
+        console.log("lifting up by: " + value);
+        r.up(value);
+      }else{
+        //r.drone.stop();
+      }
+      break;
+      default: {}
     }
-    break;
-    default: {}
   }
 
-/*  console.log("move", {
-    id: id,
-    axis: axis,
-    value: value,
-  }); */
+  /*  console.log("move", {
+  id: id,
+  axis: axis,
+  value: value,
+}); */
 });
 
 // Listen for button up events on all gamepads
-gamepad.on("up", function (id, num) {
-
-  switch(num) {
-    case 0:
-    console.log("takeoff!");
-    r.drone.takeOff();
-    break;
-    case 1:
-    console.log("hovering...");
-    r.drone.stop();
-    break;
-    case 2:
-    console.log("landing...");
-    r.drone.land();
-    break;
-    default:
-    r.drone.emergency();
+gamepad.on("down", function (id, num) {
+  if(!Drone.isConnected()){
+    console.log("No Drone-Connection");
+  }else{
+    try{
+      switch(num) {
+        case 0:
+        console.log("takeoff!");
+        r.takeOff();
+        break;
+        case 1:
+        console.log("hovering...");
+        r.stop();
+        break;
+        case 2:
+        console.log("landing...");
+        r.land();
+        break;
+        case 3:
+        console.log("clockwise -> 20");
+        r.clockwise(20);
+        break;
+        case 4:
+        console.log("counterclockwise -> 20");
+        r.counterClockwise(20);
+        break;
+        case 5:
+        console.log("taking picture");
+        r.takePicture();
+        break;
+        case 6:
+        console.log("EMERGENCY!");
+        r.emergency();
+        break;
+        case 7:
+        console.log("frontflip...");
+        r.frontFlip();
+        break;
+        case 8:
+        console.log("backflip...");
+        r.backFlip();
+        break;
+        case 9:
+        console.log("startRecording...");
+        r.startRecording();
+        break;
+        case 10:
+        console.log("stopRecording...");
+        r.stopRecording();
+        break;
+        default:
+        r.emergency();
+      }
+    }catch (e){
+      r.land();
+    }
   }
 
   console.log("up", {
