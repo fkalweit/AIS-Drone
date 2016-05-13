@@ -12,17 +12,14 @@ Drohne ist also d.drone
 */
 var Drone = require('./drone');
 var r = Drone.getAndActivateDrone();
-r.MediaStreaming.videoEnable(1);
+//r.MediaStreaming.videoEnable(1);
 
-var fs = require("fs"),
-
-var output = fs.createWriteStream("./video.h264");
-var video = r.getVideoStream();
+var fs = require("fs");
 
 var gamepad = require("gamepad");
 
 // Initialize the library
-gamepad.init()
+gamepad.init();
 
 // List the state of all currently attached devices
 for (var i = 0, l = gamepad.numDevices(); i < l; i++) {
@@ -34,9 +31,15 @@ setInterval(gamepad.processEvents, 16);
 // Scan for new gamepads as a slower rate
 setInterval(gamepad.detectDevices, 500);
 
+//while(!Drone.isConnected()){
+
+//}
+
 
 if(!Drone.isConnected()){
   console.log("No Drone-Connection");
+}else{
+
 }
 
 

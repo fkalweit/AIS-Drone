@@ -19,7 +19,28 @@ var http = require('http'),
 var ffmpeg = require('fluent-ffmpeg');
 
 
-http.createServer(function (req, res) {
+const dgram = require('dgram');
+const server = dgram.createSocket('udp4');
+
+server.on('error', (err) => {
+  console.log(`server error:\n${err.stack}`);
+  server.close();
+});
+
+server.on('message', (msg, rinfo) => {
+  console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
+});
+
+server.on('listening', () => {
+  var address = server.address();
+  console.log(`server listening ${address.address}:${address.port}`);
+});
+
+server.bind(1337);
+socket.send()
+// server listening 0.0.0.0:41234
+
+/*http.createServer(function (req, res) {
 
   var fs = require('fs');
 var stat = fs.statSync('test.h264');
@@ -42,6 +63,7 @@ res.writeHead(200, {
         //.withAspect('16:9')
         //.withFps(24)
         .format('h264')
+        .outputOption('-movflags frag_keyframe+faststart')
         .pipe(res);
   } catch (e) {
     console.log(e);
@@ -52,3 +74,4 @@ res.writeHead(200, {
 
 }).listen(1337, '192.168.0.105');
 console.log('Server running at http://127.0.0.1:1337/');
+*/
