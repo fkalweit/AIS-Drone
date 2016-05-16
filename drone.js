@@ -123,10 +123,8 @@ function printGUI(){
   }
 };
 
-
-
 // Export-Methoden des Moduls.
-// Ermöglicht Aufruf der Drohne in anderen Modulen.
+// Ermöglicht Aufruf der Drohne und anderer Funktionen in anderen Modulen.
 module.exports = {
   getAndActivateDrone: function () {
     return drone;
