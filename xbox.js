@@ -8,6 +8,7 @@ var r = Drone.getAndActivateDrone();
 var balanceboardconnected = false;
 var logxboxcontrolleraxes = false;
 var logxboxcontrollerbuttons = false;
+Drone.useGUI(true);
 //r.MediaStreaming.videoEnable(1);
 
 //var fs = require("fs");
@@ -181,8 +182,8 @@ gamepad.on("down", function (id, num) {
           break;
         case 1:
           if(logxboxcontrollerbuttons)
-            console.log("backflip...");
-          r.backFlip();
+            console.log("reset Home to current Position");
+          Drone.setCurrentPositionToHome();
           break;
         case 2:
           if(logxboxcontrollerbuttons)
@@ -206,13 +207,13 @@ gamepad.on("down", function (id, num) {
           break;
         case 6:
           if(logxboxcontrollerbuttons)
-            console.log("startRecording...");
-            r.startRecording();
-            break;
+            console.log("returning Home...home...sweet home");
+          r.Piloting.navigateHome(1);
+          break;
         case 7:
           if(logxboxcontrollerbuttons)
-          console.log("stopRecording...");
-            r.stopRecording();
+            console.log("aborted flying home...");
+          r.Piloting.navigateHome(0);
           break;
         case 8:
           if(logxboxcontrollerbuttons)

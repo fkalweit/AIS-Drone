@@ -1,29 +1,73 @@
 var Bebop = require('node-bebop');
 
+// Zum installieren: npm install console.table --save
+var Table = require('console.table');
+
+var usegui = false;
+
 var drone = Bebop.createClient();
 var connected = false;
 
+var battery = 0;
+var state = "";
+
+// Current GPS Position
+var altitude = 0.0;
+var longitude = 0.0;
+var latitude = 0.0;
+
+// Home GPS Position
+var h_altitude = 0.0;
+var h_longitude = 0.0;
+var h_latitude = 0.0;
+
 drone.connect(function() {
   connected = true;
-  console.log("Drone connected!");
+  printGUI();
 
   drone.GPSSettings.resetHome();
   //drone.WifiSettings.outdoorSetting(1);
 
-  drone.on("battery", function(status){
-    console.log(status);
+  drone.on("ready", function() {
+    state = "ready";
+    printGUI();
   });
 
   drone.on("flying", function(derp){
-    console.log("and now... we fly!!!");
+    state = "flying";
+    printGUI();
   });
 
-  drone.on("takingOff", function(derp){
-    console.log("Ladies and Gentlemen.... TAKEOFF!!!");
+  drone.on("landed", function() {
+    state = "landed";
+    printGUI();
   });
 
-  drone.on("SpeedBridleEvent", function(status){
-    console.log(status);
+  drone.on("landing", function() {
+    state = "landing";
+    printGUI();
+  });
+
+  drone.on("hovering", function() {
+    state = "hovering";
+    printGUI();
+  });
+
+  drone.on("takingOff", function(){
+    state = "takingOff";
+    printGUI();
+  });
+
+  drone.on("battery", function(status){
+    battery = status;
+    printGUI();
+  });
+
+  drone.on("HomeChanged", function(pos){
+    h_altitude = pos.altitude;
+    h_longitude = pos.longitude;
+    h_latitude = pos.latitude;
+    printGUI();
   });
 
   /*drone.on("AltitudeChanged", function(altitude){
@@ -40,9 +84,46 @@ drone.connect(function() {
 
   drone.on("PositionChanged", function(pos){
     //console.log(pos);
-    console.log("Position: H: " + pos.altitude +  " L: " + pos.longitude + " B: " + pos.latitude);
+    altitude = pos.altitude;
+    longitude = pos.longitude;
+    latitude = pos.latitude;
+    printGUI();
   });
-})
+});
+
+function printGUI(){
+  if(usegui){
+    console.log('\033[2J');
+
+    console.table([
+    {
+      State: 'Is Connected: ',
+      CurrentValue: String(connected)
+    }, {
+      State: 'Drohnestatus: ',
+      CurrentValue: state
+    }, {
+      State: 'Battery: ',
+      CurrentValue: battery
+    }, {
+      State: 'GPS: ',
+      H: altitude,
+      L: longitude,
+      B: latitude
+    }, {
+      State: 'Home Position:',
+      H: h_altitude,
+      L: h_longitude,
+      B: h_latitude
+    }
+  ]);
+
+    console.log("\r\n");
+    console.log("\r\n");
+  }
+};
+
+
 
 // Export-Methoden des Moduls.
 // Ermöglicht Aufruf der Drohne in anderen Modulen.
@@ -55,7 +136,12 @@ module.exports = {
     return connected;
   },
 
-  getBatteryStatus: function(callback){
-     drone.battery(callback);
+  setCurrentPositionToHome: function(){
+    drone.GPSSettings.setHome(latitude, longitude, altitude);
+    printGUI();
+  },
+
+  useGUI: function(value){
+    usegui = value;
   }
 };
