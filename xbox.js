@@ -4,7 +4,10 @@ Drohne ist also r
 */
 var Drone = require('./drone');
 var r = Drone.getAndActivateDrone();
+
 var balanceboardconnected = false;
+var logxboxcontrolleraxes = false;
+var logxboxcontrollerbuttons = false;
 //r.MediaStreaming.videoEnable(1);
 
 //var fs = require("fs");
@@ -99,45 +102,59 @@ gamepad.on("move", function (id, axis, value) {
   }else{
     switch(axis){
       case 0:
-      if(value > 0.15){
-        value = Math.round(value * 100);
-        console.log("moving right by: " + value);
-        r.right(value);
-      }else if(value < -0.15){
-        value = Math.round(value * -100);
-        console.log("moving left by: " + value);
-        r.left(value);
-      }else{
-        //r.drone.hover();
-      }
-      break;
+        if(value > 0.15){
+          value = Math.round(value * 100);
+
+          if(logxboxcontrolleraxes)
+          console.log("moving right by: " + value);
+
+          r.right(value);
+        }else if(value < -0.15){
+          value = Math.round(value * -100);
+
+          if(logxboxcontrolleraxes)
+          console.log("moving left by: " + value);
+
+          r.left(value);
+        }else{
+          //r.drone.hover();
+        }
+        break;
       case 1:
-      if(value > 0.15){
-        value = Math.round(value * 100);
-        console.log("moving backward by: " + value);
-        r.backward(value);
-      }else if(value < -0.15){
-        value = Math.round(value * -100);
-        console.log("moving forward by: " + value);
-        r.forward(value);
-      }else{
-        //r.drone.stop();
-      }
-      break;
+        if(value > 0.15){
+          value = Math.round(value * 100);
 
+          if(logxboxcontrolleraxes)
+          console.log("moving backward by: " + value);
+
+          r.backward(value);
+        }else if(value < -0.15){
+          value = Math.round(value * -100);
+
+          if(logxboxcontrolleraxes)
+          console.log("moving forward by: " + value);
+
+          r.forward(value);
+        }else{
+          //r.drone.stop();
+        }
+        break;
       case 2:
-      console.log(value);
-      value = Math.round((value * 50) + 50);
-      console.log("lifting up by: " + value);
-      r.up(value);
-      break;
+        value = Math.round((value * 50) + 50);
 
+        if(logxboxcontrolleraxes)
+        console.log("lifting up by: " + value);
+
+        r.up(value);
+        break;
       case 5:
-      console.log(value);
-      value = Math.round((value * 50) + 50);
-      console.log("sinking down by: " + value);
-      r.down(value);
-      break;
+        value = Math.round((value * 50) + 50);
+
+        if(logxboxcontrolleraxes)
+        console.log("sinking down by: " + value);
+
+        r.down(value);
+        break;
       default: {}
     }
   }
@@ -158,60 +175,63 @@ gamepad.on("down", function (id, num) {
     try{
       switch(num) {
         case 0:
-        console.log("takeoff!");
-        r.takeOff();
-        break;
+          if(logxboxcontrollerbuttons)
+            console.log("takeoff!");
+          r.takeOff();
+          break;
         case 1:
-        console.log("backflip...");
-        r.backFlip();
-        break;
+          if(logxboxcontrollerbuttons)
+            console.log("backflip...");
+          r.backFlip();
+          break;
         case 2:
-        console.log("hovering...");
-        r.stop();
-        break;
+          if(logxboxcontrollerbuttons)
+            console.log("hovering...");
+          r.stop();
+          break;
         case 3:
-        console.log("landing...");
-        r.land();
-        break;
+          if(logxboxcontrollerbuttons)
+            console.log("landing...");
+          r.land();
+          break;
         case 4:
-        console.log("counterclockwise -> 30");
-        r.counterClockwise(30);
-        break;
+          if(logxboxcontrollerbuttons)
+            console.log("counterclockwise -> 30");
+          r.counterClockwise(30);
+          break;
         case 5:
-        console.log("clockwise -> 30");
-        r.clockwise(30);
-        //r.stop();
-        //console.log("hovering...");
-        //console.log("taking picture");
-        //r.takePicture();
-        break;
+          if(logxboxcontrollerbuttons)
+            console.log("clockwise -> 30");
+          r.clockwise(30);
+          break;
         case 6:
-        console.log("startRecording...");
-        r.startRecording();
-
-        break;
+          if(logxboxcontrollerbuttons)
+            console.log("startRecording...");
+            r.startRecording();
+            break;
         case 7:
-        console.log("stopRecording...");
-        r.stopRecording();
-        //console.log("frontflip...");
-        //r.frontFlip();
-        break;
+          if(logxboxcontrollerbuttons)
+          console.log("stopRecording...");
+            r.stopRecording();
+          break;
         case 8:
-        console.log("EMERGENCY!");
-        r.emergency();
-        break;
+          if(logxboxcontrollerbuttons)
+            console.log("EMERGENCY!");
+          r.emergency();
+          break;
         case 9:
-        console.log("Balance Board activated");
-        balanceboardconnected = true;
-        console.log("Balance Board Aktiviert");
-        break;
+          balanceboardconnected = true;
+          if(logxboxcontrollerbuttons)
+            console.log("Balance Board Aktiviert");
+            break;
         case 10:
-        console.log("Balance Board Deaktiviert");
-        balanceboardconnected = false;
-        r.stop();
-        console.log("Hovering...");
-        //r.stopRecording();
-        break;
+          if(logxboxcontrollerbuttons)
+            console.log("Balance Board Deaktiviert");
+          balanceboardconnected = false;
+          r.stop();
+          if(logxboxcontrollerbuttons)
+            console.log("Hovering...");
+          break;
         default:
         r.land();
       }
@@ -233,13 +253,15 @@ gamepad.on("down", function (id, num) {
       try{
         switch(num) {
           case 4:
-          console.log("counterclockwise -> 0");
-          r.counterClockwise(0);
-          break;
+            if(logxboxcontrollerbuttons)
+              console.log("counterclockwise -> 0");
+            r.counterClockwise(0);
+            break;
           case 5:
-          console.log("clockwise -> 0");
-          r.clockwise(0);
-          break;
+            if(logxboxcontrollerbuttons)
+              console.log("clockwise -> 0");
+            r.clockwise(0);
+            break;
           default:
           //r.land();
         }
