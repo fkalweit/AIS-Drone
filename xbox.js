@@ -4,10 +4,14 @@ Drohne ist also r
 */
 var Drone = require('./drone');
 var r = Drone.getAndActivateDrone();
+var balanceboardconnected = false;
 //r.MediaStreaming.videoEnable(1);
 
 //var fs = require("fs");
 var gamepad = require("gamepad");
+var net = require('net');
+var split = require('split');
+
 
 // Initialize the library
 gamepad.init();
@@ -32,6 +36,60 @@ if(!Drone.isConnected()){
 }else{
 
 }
+
+var server = net.createServer(function(connection) {
+  console.log("Client connected");
+
+  connection.setEncoding('utf8');
+
+  var stream = connection.pipe(split(JSON.parse));
+
+  stream.on('data', function(data){
+    var massX = data['massX'];
+    var massY = data['massY'];
+
+    if(balanceboardconnected){
+      if(!Drone.isConnected()){
+        console.log("No Drone-Connection");
+      }else{
+      if(massX > 0.1){
+        massX = Math.round(massX * 100);
+        console.log("moving right by: " + massX);
+        r.right(massX);
+      }else if(massX < -0.1){
+        massX = Math.round(massX * -100);
+        console.log("moving left by: " + massX);
+        r.left(massX);
+      }else{
+        //r.drone.hover();
+      }
+
+      if(massY > 0.1){
+        massY = Math.round(massY * 100);
+        console.log("moving backward by: " + massY);
+        r.backward(massY);
+      }else if(massY < -0.1){
+        massY = Math.round(massY * -100);
+        console.log("moving forward by: " + massY);
+        r.forward(massY);
+      }else{
+
+        //r.drone.stop();
+      }
+    }
+    }
+  });
+
+  connection.on ('end', function(status){
+    console.log('Balance Board Disconnected!!!');
+    r.stop();
+  });
+});
+
+server.listen({host: 'localhost', port: 6112, exclusive: true}, () => {
+  address = server.address();
+  console.log('opened server on %j', address);
+});
 
 
 // Listen for move events on all gamepads
@@ -144,14 +202,14 @@ gamepad.on("down", function (id, num) {
         break;
         case 9:
         console.log("Balance Board activated");
-        //TODO
-        //console.log("startRecording...");
-        //r.startRecording();
+        balanceboardconnected = true;
+        console.log("Balance Board Aktiviert");
         break;
         case 10:
-        console.log("Balance Board deactivated");
-        //TODO
-        //console.log("stopRecording...");
+        console.log("Balance Board Deaktiviert");
+        balanceboardconnected = false;
+        r.stop();
+        console.log("Hovering...");
         //r.stopRecording();
         break;
         default:
