@@ -3,6 +3,8 @@ var Bebop = require('node-bebop');
 // Zum installieren: npm install console.table --save
 var Table = require('console.table');
 
+var Geofencing = require('./geofencing')
+
 var usegui = false;
 
 var drone = Bebop.createClient();
@@ -16,10 +18,15 @@ var altitude = 0.0;
 var longitude = 0.0;
 var latitude = 0.0;
 
+var utm;
+
 // Home GPS Position
 var h_altitude = 0.0;
 var h_longitude = 0.0;
 var h_latitude = 0.0;
+var h_isSet = false;
+
+var h_utm;
 
 drone.connect(function() {
   connected = true;
@@ -67,6 +74,8 @@ drone.connect(function() {
     h_altitude = pos.altitude;
     h_longitude = pos.longitude;
     h_latitude = pos.latitude;
+    h_utm = convertLatLongToUtm(h_latitude, h_longitude, 32);
+    h_isSet = true;
     printGUI();
   });
 
@@ -87,6 +96,16 @@ drone.connect(function() {
     altitude = pos.altitude;
     longitude = pos.longitude;
     latitude = pos.latitude;
+
+    if(h_isSet) {
+      utm = convertLatLongToUtm(latitude, longitude,32);
+      var distanceFromHome = Math.sqrt(Math.pow(h_utm.northing - utm.northing,2) + Math.pow(h_utm.easting - utm.easting,2));
+        if(distanceFromHome>10)
+          console.log('Drone out of range:' + distanceFromHome + ">" + 10)
+          drone.client.stop();
+        }
+    }
+
     printGUI();
   });
 });
