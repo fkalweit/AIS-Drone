@@ -281,3 +281,11 @@ gamepad.on("down", function (id, num) {
     num: num,
   });
 });
+
+
+module.exports = {
+log_level: function(value){
+  logxboxcontrolleraxes = value;
+  logxboxcontrollerbuttons = value;
+  }
+};
