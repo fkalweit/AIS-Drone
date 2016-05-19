@@ -11,6 +11,9 @@ Per Default wird der Xbox-Controller zum Steuern benutzt und auf der Console wer
 
 ![screenshot 2016-05-19-15 33 49](https://cloud.githubusercontent.com/assets/9308836/15395297/6b3dc334-1dd7-11e6-961d-24e6ff83bfad.jpg)
 
+## Tastenbelegung ##
+![xbox-default](xbox-default.png)
+
 ## Code Infos ##
 Die Node Anwendung ist Komponentenweise aufgebaut. Um eine Komponente in einer anderen zu benutzen einfach require(./name) (ohne .js) verwenden, dann steht alles im Module-Exports-Block zur Verfügung.
 
