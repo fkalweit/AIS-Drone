@@ -66,6 +66,7 @@ function printHelp(){
     },
     {
       OPTION: '-v',
+      OPTION2: '--verbose',
       DESCRIPTION: 'Prints debug log on stdout'
     },
     {
@@ -74,6 +75,41 @@ function printHelp(){
     }
   ]);
 
+  console.log("Assignment of controller keys:\n");
+  console.table([
+  {
+    Button: 'A',
+    DESCRIPTION: 'takeoff'
+  },
+  {
+    Button: 'B',
+    DESCRIPTION: 'reset home'
+  },
+  {
+    Button: 'X',
+    DESCRIPTION: 'hovering'
+  },
+  {
+    Button: 'Y',
+    DESCRIPTION: 'landing'
+  },
+  {
+    Button: 'LB',
+    DESCRIPTION: 'counterclockwise'
+  },
+  {
+    Button: 'RB',
+    DESCRIPTION: 'clockwise'
+  },
+  {
+    Button: 'press left stick',
+    DESCRIPTION: 'return to home'
+  },
+  {
+    Button: 'press right stick',
+    DESCRIPTION: 'abort flying home'
+  }
+]);
     console.log("\n");
 
 };
