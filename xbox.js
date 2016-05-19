@@ -8,7 +8,7 @@ var r = Drone.getAndActivateDrone();
 var balanceboardconnected = false;
 var logxboxcontrolleraxes = false;
 var logxboxcontrollerbuttons = false;
-Drone.useGUI(true);
+//Drone.useGUI(true);
 //r.MediaStreaming.videoEnable(1);
 
 //var fs = require("fs");
