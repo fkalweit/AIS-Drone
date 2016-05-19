@@ -78,6 +78,18 @@ function printHelp(){
   console.log("Assignment of controller keys:\n");
   console.table([
   {
+    Button: 'XBOX',
+    DESCRIPTION: 'emergency'
+  },
+  {
+    Button: 'back',
+    DESCRIPTION: 'return to home'
+  },
+  {
+    Button: 'start',
+    DESCRIPTION: ''
+  },
+  {
     Button: 'A',
     DESCRIPTION: 'takeoff'
   },
@@ -102,12 +114,20 @@ function printHelp(){
     DESCRIPTION: 'clockwise'
   },
   {
+    Button: 'LT',
+    DESCRIPTION: 'rise'
+  },
+  {
+    Button: 'RT',
+    DESCRIPTION: 'sink'
+  },
+  {
     Button: 'press left stick',
-    DESCRIPTION: 'return to home'
+    DESCRIPTION: 'activate balance board'
   },
   {
     Button: 'press right stick',
-    DESCRIPTION: 'abort flying home'
+    DESCRIPTION: 'deactivate balance board'
   }
 ]);
     console.log("\n");
