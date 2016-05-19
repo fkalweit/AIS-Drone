@@ -1,40 +1,42 @@
-"use strict";
+console.log("STREAM");
+var Drone = require('./drone');
+var r = Drone.getAndActivateDrone();
+var cv = require("opencv");
 
-var bebop = require("node-bebop"),
-    cv = require("opencv");
-
-var drone = bebop.createClient(),
-    mjpg = drone.getMjpegStream(),
+var mjpg = r.getMjpegStream(),
     buf = null,
     w = new cv.NamedWindow("Video", 0);
 
-drone.connect(function() {
-  drone.MediaStreaming.videoEnable(1);
-});
+  console.log("MJpegStream");
 
-mjpg.on("data", function(data) {
-  buf = data;
-});
+  r.connect(function() {
+    console.log("start MediaStreaming");
+    drone.MediaStreaming.videoEnable(1);
+  });
 
-setInterval(function() {
-  if (buf == null) {
-    return;
-  }
+  mjpg.on("data", function(data) {
+    buf = data;
+  });
 
-  try {
-    cv.readImage(buf, function(err, im) {
-      if (err) {
-        console.log(err);
-      } else {
-        if (im.width() < 1 || im.height() < 1) {
-          console.log("no width or height");
-          return;
+  setInterval(function() {
+    if (buf == null) {
+      return;
+    }
+
+    try {
+      console.log("cv read Buffer");
+      cv.read(buf, function(err, im) {
+        if (err) {
+          console.log(err);
+        } else {
+          if (im.width() < 1 || im.height() < 1) {
+            return;
+          }
+          w.show(im);
+          w.blockingWaitKey(0, 50);
         }
-        w.show(im);
-        w.blockingWaitKey(0, 50);
-      }
-    });
-  } catch(e) {
-    console.log(e);
-  }
-}, 10);
+      });
+    } catch(e) {
+      console.log(e);
+    }
+  }, 10);
