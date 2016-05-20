@@ -16,6 +16,12 @@ var gamepad = require("gamepad");
 var net = require('net');
 var split = require('split');
 
+var calibrated = false;
+var axe = -1;
+var calibR = 0.0;
+var calibF = 0.0;
+var calibB = 0.0;
+var calibL = 0.0;
 
 // Initialize the library
 gamepad.init();
@@ -49,39 +55,44 @@ var server = net.createServer(function(connection) {
   var stream = connection.pipe(split(JSON.parse));
 
   stream.on('data', function(data){
-    var massX = data['massX'];
-    var massY = data['massY'];
 
     if(balanceboardconnected){
       if(!Drone.isConnected()){
         console.log("No Drone-Connection");
       }else{
-      if(massX > 0.1){
-        massX = Math.round(massX * 100);
-        console.log("moving right by: " + massX);
-        r.right(massX);
-      }else if(massX < -0.1){
-        massX = Math.round(massX * -100);
-        console.log("moving left by: " + massX);
-        r.left(massX);
-      }else{
-        //r.drone.hover();
-      }
+        if(!calibrated){
+          calibrate(data);
+        }else{
+          var massX = data['massX'];
+          var massY = data['massY'];
 
-      if(massY > 0.1){
-        massY = Math.round(massY * 100);
-        console.log("moving backward by: " + massY);
-        r.backward(massY);
-      }else if(massY < -0.1){
-        massY = Math.round(massY * -100);
-        console.log("moving forward by: " + massY);
-        r.forward(massY);
-      }else{
+            if(massX > 0.1){
+              massX = Math.round(massX * 100) * (100 / calibR);
+              //console.log("moving right by: " + massX);
+              r.right(massX);
+            }else if(massX < -0.1){
+              massX = Math.round(massX * -100) * (100 / -calibL);
+              //console.log("moving left by: " + massX);
+              r.left(massX);
+            }else{
+              //r.drone.hover();
+            }
 
-        //r.drone.stop();
-      }
+            if(massY > 0.1){
+              massY = Math.round(massY * 100) * (100 / calibB);
+              //console.log("moving backward by: " + massY);
+              r.backward(massY);
+            }else if(massY < -0.1){
+              massY = Math.round(massY * -100) * (100 / -calibF);
+              //console.log("moving forward by: " + massY);
+              r.forward(massY);
+            }else{
+
+              //r.drone.stop();
+            }
+        }
     }
-    }
+  }
   });
 
   connection.on ('end', function(status){
@@ -282,6 +293,62 @@ gamepad.on("down", function (id, num) {
   });
 });
 
+function calibrate(data){
+  if(axe == -1){
+    startCalibInterval();
+  }
+
+  var massX = data['massX'] * 100;
+  var massY = data['massY'] * 100;
+
+    if(massX > 0.1 && axe == 0){
+      calibR = max(massX, calibR);
+      console.log("R-Max: " + calibR);
+    }else if(massX < -0.1 && axe == 1){
+      calibL = min(massX, calibL);
+      console.log("L-Max: " + calibL);
+    }else{
+      //r.drone.hover();
+    }
+
+    if(massY > 0.1 && axe == 2){
+      calibB = max(massY, calibB);
+      console.log("B-Max: " + calibB);
+    }else if(massY < -0.1 && axe == 3){
+      calibF = min(massY, calibF);
+      console.log("F-Max: " + calibF);
+    }else{
+      //r.drone.stop();
+    }
+}
+
+function startCalibInterval(){
+  axe++;
+  console.log("Achse: " + axe + " wird kalibriert");
+  setTimeout(function () {
+    if(axe < 3){
+      startCalibInterval();
+    }else if(axe >= 3){
+      calibrated = true;
+    }
+  }, 5000);
+}
+
+function max(a, b){
+  if(a > b){
+    return a;
+  }else{
+    return b;
+  }
+}
+
+function min(a, b){
+  if(a > b){
+    return b;
+  }else{
+    return a;
+  }
+}
 
 module.exports = {
 log_level: function(value){

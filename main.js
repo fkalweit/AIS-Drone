@@ -34,6 +34,8 @@ if(!Drone.isConnected()){
   console.log("No Drone-Connection");
 }else{
 
+  r.MediaStreaming.videoEnable(true);
+
   if(gui) Drone.useGUI(true);
 
   var xbox = require('./xbox');

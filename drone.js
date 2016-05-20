@@ -8,7 +8,9 @@ var usegui = false;
 var drone = Bebop.createClient();
 var connected = false;
 
-var battery = 0;
+var balanceBoardActivated = false;
+
+var battery = "not set yet";
 var state = "";
 
 // Current GPS Position
@@ -60,7 +62,7 @@ drone.connect(function() {
   });
 
   drone.on("battery", function(status){
-    battery = status;
+    battery = status + "%";
     printGUI();
   });
 
@@ -117,6 +119,9 @@ function printGUI(){
       State: 'Is Connected: ',
       CurrentValue: String(connected)
     }, {
+      State: 'Balance Board Activated: ',
+      CurrentValue: balanceBoardActivated
+    }, {
       State: 'Drohnestatus: ',
       CurrentValue: state
     }, {
@@ -167,6 +172,11 @@ module.exports = {
   getMjpegStream:  function(){
     drone.MediaStreaming.videoEnable(1);
     return drone.getMjpegStream();
+  },
+
+  setBoardActivated: function(val){
+    balanceboardconnected = val;
+    printGUI();
   }
 
 };
