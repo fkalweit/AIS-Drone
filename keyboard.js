@@ -76,7 +76,7 @@ Cylon.robot({
 	
 	k.keyboard.on('o', function(key) {
       console.log("SetHome");
-      r.setCurrentPositionToHome();
+      Drone.setCurrentPositionToHome();
     });
 	
 	k.keyboard.on('p', function(key) {
