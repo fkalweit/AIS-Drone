@@ -29,7 +29,7 @@ drone.connect(function() {
   printGUI();
 
   drone.GPSSettings.resetHome();
-  drone.Calibration.magnetoCalibration(1);
+  //drone.Calibration.magnetoCalibration(1);
   //drone.WifiSettings.outdoorSetting(1);
 
   drone.on("ready", function() {
