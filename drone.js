@@ -141,5 +141,15 @@ module.exports = {
 
   useGUI: function(value){
     usegui = value;
+  },
+
+  videoEnable: function(){
+    drone.MediaStreaming.videoEnable(1);
+  },
+
+  getMjpegStream:  function(){
+    drone.MediaStreaming.videoEnable(1);
+    return drone.getMjpegStream();
   }
+
 };
