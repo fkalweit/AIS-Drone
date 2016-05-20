@@ -27,6 +27,8 @@ process.argv.forEach(function (val, index, array) {
   }
 });
 
+
+setInterval(function() {
 //DEFAULT: start xbox with ui without log + no stream
 if(!Drone.isConnected()){
   console.log("No Drone-Connection");
@@ -45,7 +47,7 @@ if(!Drone.isConnected()){
   if(stream) var MJpegStream = require('./mjpeg');
 
 }
-
+  }, 2000);
 
 function printHelp(){
 
