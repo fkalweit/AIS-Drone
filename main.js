@@ -17,18 +17,21 @@ process.argv.forEach(function (val, index, array) {
     case "-s":
     case "--stream":
       stream = true;
+      break;
     case "-v":
     case "--verbose":
       log = true;
+      break;
     case "--no-ui":
       gui = false;
+      break;
     default:
     return 0;
   }
 });
 
 
-setInterval(function() {
+setTimeout(function() {
 //DEFAULT: start xbox with ui without log + no stream
 if(!Drone.isConnected()){
   console.log("No Drone-Connection");
@@ -37,19 +40,17 @@ if(!Drone.isConnected()){
   r.MediaStreaming.videoEnable(true);
 
   if(gui) Drone.useGUI(true);
-
   var xbox = require('./xbox');
+  if(stream) xbox.start_stream(true);
   if (log) {
     xbox.log_level(true);
   }
   else {
     xbox.log_level(false);
   }
-
-  if(stream) var MJpegStream = require('./mjpeg');
-
+  //if(stream) var MJpegStream = require('./mjpeg');
 }
-  }, 2000);
+  }, 1000);
 
 function printHelp(){
 

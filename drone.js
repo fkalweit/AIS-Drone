@@ -25,6 +25,7 @@ var h_latitude = 0.0;
 
 drone.connect(function() {
   connected = true;
+  drone.MediaStreaming.videoEnable(1);
   printGUI();
 
   drone.GPSSettings.resetHome();
@@ -169,7 +170,7 @@ module.exports = {
     drone.MediaStreaming.videoEnable(1);
   },
 
-  getMjpegStream:  function(){
+  getStream:  function(){
     drone.MediaStreaming.videoEnable(1);
     return drone.getMjpegStream();
   },
