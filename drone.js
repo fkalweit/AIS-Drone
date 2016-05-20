@@ -12,6 +12,7 @@ var balanceBoardActivated = false;
 
 var battery = "not set yet";
 var state = "";
+var satellites = "";
 
 // Current GPS Position
 var altitude = 0.0;
@@ -74,8 +75,9 @@ drone.connect(function() {
     printGUI();
   });
 
-  drone.on("MagnetoCalibrationStateChanged", function(mag){
-    console.log(mag);
+  drone.on("NumberOfSatelliteChanged", function(num){
+    satellites = num.numberOfSatellite;
+    printGUI();
   });
 
   /*drone.on("AltitudeChanged", function(altitude){
@@ -86,9 +88,9 @@ drone.connect(function() {
     console.log("Longitude: " + longitude);
   });*/
 
-  drone.on("GPSFixStateChanged", function(pos){
-    console.log(pos);
-  });
+  //drone.on("GPSFixStateChanged", function(pos){
+  //  console.log(pos);
+  //});
 
   drone.on("PositionChanged", function(pos){
     //console.log(pos);
@@ -128,6 +130,9 @@ function printGUI(){
     }, {
       State: 'Battery: ',
       CurrentValue: battery
+    }, {
+      State: 'Satellites: ',
+      CurrentValue: satellites
     }, {
       State: 'GPS: ',
       H: altitude,
