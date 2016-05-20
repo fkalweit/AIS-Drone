@@ -1,16 +1,14 @@
+console.log("STREAM");
+
 "use strict";
 
-var bebop = require("node-bebop"),
-    cv = require("opencv");
+var cv = require("opencv");
+var Drone = require('./drone');
+var r = Drone.getAndActivateDrone();
 
-var drone = bebop.createClient(),
-    mjpg = drone.getMjpegStream(),
+var mjpg = Drone.getMjpegStream(),
     buf = null,
     w = new cv.NamedWindow("Video", 0);
-
-drone.connect(function() {
-  drone.MediaStreaming.videoEnable(1);
-});
 
 mjpg.on("data", function(data) {
   buf = data;
@@ -37,4 +35,4 @@ setInterval(function() {
   } catch(e) {
     console.log(e);
   }
-}, 10);
+}, 100);

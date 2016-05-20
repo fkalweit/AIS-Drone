@@ -1,0 +1,48 @@
+{
+	"name": "AIS-Drone",
+	"version": "0.1.0",
+	"description": "Projekt für AIS Seminar HS-KL",
+	"keywords": [
+		"drone",
+		"bebop",
+		"HS-KL",
+		"AIS"
+	],
+	"bugs": {
+		"url": "https://github.com/fog1992/AIS-Drone/issues"
+	},
+  "author": "Templin, Oswald, Puderer, Kalweit",
+	"contributors": [
+		{
+			"name": "Templin Stefan"
+		},
+		{
+			"name": "Oswald Florian"
+		},
+		{
+			"name": "Puderer Tobias"
+		},
+		{
+			"name": "Kalweit Fabian"
+		}
+	],
+	"scripts": {
+    "start": "node main.js"
+	},
+	"main": "main.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/fog1992/AIS-Drone.git"
+	},
+	"dependencies": {
+		"fluent-ffmpeg": "~2.1.0",
+		"opencv": ">=5.0.0",
+		"gamepad": "~1.2.2",
+		"node-bebop": "0.6.0",
+		"console.table": ">=0.4.0",
+		"net": ">=1.0.2",
+    "split": ">=1.0.0"
+	},
+	"private": true,
+	"engine": "node ~0.4.0"
+}
