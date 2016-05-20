@@ -3,8 +3,6 @@ var areaRadiusInMeter = 10.5;
 var isOutOfArea = false;
 var currentDistanceFromHome = -1;
 var OutOfAreaContextState = "";
-
-
 var Bebop = require('node-bebop');
 
 // Zum installieren: npm install console.table --save
@@ -15,7 +13,9 @@ var usegui = true;
 var drone = Bebop.createClient();
 var connected = false;
 
-var battery = 0;
+var balanceBoardActivated = false;
+
+var battery = "not set yet";
 var state = "";
 
 // Current GPS Position
@@ -34,7 +34,7 @@ drone.connect(function() {
   printGUI();
 
   drone.GPSSettings.resetHome();
-  drone.Calibration.magnetoCalibration(1);
+  //drone.Calibration.magnetoCalibration(1);
   //drone.WifiSettings.outdoorSetting(1);
 
   drone.on("ready", function() {
@@ -68,7 +68,7 @@ drone.connect(function() {
   });
 
   drone.on("battery", function(status){
-    battery = status;
+    battery = status + "%";
     printGUI();
   });
 
@@ -83,8 +83,7 @@ drone.connect(function() {
     isOutOfArea = false;
 
 	
-	
-    printGUI();
+	printGUI();
   });
 
   drone.on("MagnetoCalibrationStateChanged", function(mag){
@@ -123,8 +122,8 @@ drone.connect(function() {
 
 		OutOfAreaContextState="unknown"; 
 		
-		if(isOutOfArea){
 		  if(wasOutOfArea){
+		if(isOutOfArea){
 			if(Math.abs(lastDistanceFromHome - currentDistanceFromHome) > 1 ){ //erst nach einer Mindestbewegung prüfen in welche Richtung die Drohne fliegt
 			  if(currentDistanceFromHome > lastDistanceFromHome){ //Drohne entfernt sich weiter vom Home-Punkt
 				console.log("Drone is out of Area")
@@ -182,6 +181,9 @@ function printGUI(){
     }, {
       State: 'OutOfAreaContextState: ',
       CurrentValue: OutOfAreaContextState
+	}, {
+      State: 'Balance Board Activated: ',
+      CurrentValue: balanceBoardActivated
     }, {
       State: 'Drohnestatus: ',
       CurrentValue: state
@@ -233,6 +235,11 @@ module.exports = {
   getStream:  function(){
     drone.MediaStreaming.videoEnable(1);
     return drone.getMjpegStream();
+  },
+
+  setBoardActivated: function(val){
+    balanceboardconnected = val;
+    printGUI();
   }
 
 };
