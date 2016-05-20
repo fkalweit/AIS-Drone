@@ -22,6 +22,7 @@ Cylon.robot({
   },
 
   work: function(k) {
+	
     k.keyboard.on('t', function(key) {
       console.log("TAKEOFF");
       r.takeOff();
@@ -72,5 +73,16 @@ Cylon.robot({
       console.log("STOP -> HOVER");
       r.stop();
     });
+	
+	k.keyboard.on('o', function(key) {
+      console.log("SetHome");
+      r.setCurrentPositionToHome();
+    });
+	
+	k.keyboard.on('p', function(key) {
+      console.log("DISCONNECT");
+      r.Network.disconnect()
+    });
+	
   }
 }).start();
