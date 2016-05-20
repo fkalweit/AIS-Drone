@@ -117,25 +117,26 @@ drone.connect(function() {
 
 		OutOfAreaContextState="unknown"; 
 		
-		  if(wasOutOfArea){
+		 
 		if(isOutOfArea){
-			if(Math.abs(lastDistanceFromHome - currentDistanceFromHome) > 1 ){ //erst nach einer Mindestbewegung prüfen in welche Richtung die Drohne fliegt
-			  if(currentDistanceFromHome > lastDistanceFromHome){ //Drohne entfernt sich weiter vom Home-Punkt
-				console.log("Drone is out of Area")
-				OutOfAreaContextState="entfernt_sich_weiter";
-				//drone.stop();
-			  }else{
-				OutOfAreaContextState="fliegt_richtung_home";
-			  }
-			}else{
-				//OutOfAreaContextState="geringe Bewegung";
-			}
+			if(wasOutOfArea){
+				if(Math.abs(lastDistanceFromHome - currentDistanceFromHome) > 1 ){ //erst nach einer Mindestbewegung prüfen in welche Richtung die Drohne fliegt
+					if(currentDistanceFromHome > lastDistanceFromHome){ //Drohne entfernt sich weiter vom Home-Punkt
+						console.log("Drone is out of Area")
+						OutOfAreaContextState="entfernt_sich_weiter";
+						//drone.stop();
+					}else{
+						OutOfAreaContextState="fliegt_richtung_home";
+					}
+				}else{
+					//OutOfAreaContextState="geringe Bewegung";
+				}
 			
-		  }else{
-			console.log("Drone leaves Area")
-			OutOfAreaContextState="hat_Bereich_verlassen";
-			//drone.stop();
-		  }
+			}else{
+				console.log("Drone leaves Area")
+				OutOfAreaContextState="hat_Bereich_verlassen";
+				drone.stop();
+			}
 		}
 		
 	}
