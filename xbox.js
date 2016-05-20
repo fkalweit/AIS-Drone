@@ -15,7 +15,7 @@ var logxboxcontrollerbuttons = false;
 var gamepad = require("gamepad");
 var net = require('net');
 var split = require('split');
-
+var mjpgSream = false;
 
 // Initialize the library
 gamepad.init();
@@ -273,7 +273,45 @@ gamepad.on("down", function (id, num) {
   });
 
 
+setTimeout(function(){
+if (mjpgSream) {
 
+
+  console.log(mjpgSream);
+  var cv = require("opencv");
+
+  var mjpg = r.getMjpegStream(),
+      buf = null,
+      w = new cv.NamedWindow("Video", 0);
+
+  mjpg.on("data", function(data) {
+    buf = data;
+  });
+
+  setInterval(function() {
+    if (buf == null) {
+      return;
+    }
+
+    try {
+      cv.readImage(buf, function(err, im) {
+        if (err) {
+          console.log(err);
+        } else {
+          if (im.width() < 1 || im.height() < 1) {
+            console.log("no width or height");
+            return;
+          }
+          w.show(im);
+          w.blockingWaitKey(0, 50);
+        }
+      });
+    } catch(e) {
+      console.log(e);
+    }
+  }, 80);
+}
+}, 1000);
 // Listen for button down events on all gamepads
 gamepad.on("down", function (id, num) {
   console.log("down", {
@@ -287,5 +325,9 @@ module.exports = {
 log_level: function(value){
   logxboxcontrolleraxes = value;
   logxboxcontrollerbuttons = value;
+},
+start_stream: function(value){
+    console.log("start stream");
+    mjpgSream = value;
   }
 };
