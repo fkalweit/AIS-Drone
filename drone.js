@@ -26,6 +26,7 @@ drone.connect(function() {
   printGUI();
 
   drone.GPSSettings.resetHome();
+  drone.Calibration.magnetoCalibration(1);
   //drone.WifiSettings.outdoorSetting(1);
 
   drone.on("ready", function() {
@@ -70,6 +71,10 @@ drone.connect(function() {
     printGUI();
   });
 
+  drone.on("MagnetoCalibrationStateChanged", function(mag){
+    console.log(mag);
+  });
+
   /*drone.on("AltitudeChanged", function(altitude){
     //console.log("Altitude: " + altitude.class);
   });
@@ -89,6 +94,18 @@ drone.connect(function() {
     latitude = pos.latitude;
     printGUI();
   });
+});
+
+process.on('exit', (code) => {
+  drone.Network.disconnect()
+  console.log("Disconnected from the drone");
+  console.log('About to exit with code:', code);
+});
+
+process.on('SIGINT', function() {
+  console.log(" ");
+  console.log("Caught interrupt signal");
+  process.exit();
 });
 
 function printGUI(){
