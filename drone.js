@@ -8,8 +8,11 @@ var usegui = false;
 var drone = Bebop.createClient();
 var connected = false;
 
-var battery = 0;
+var balanceBoardActivated = false;
+
+var battery = "not set yet";
 var state = "";
+var satellites = "";
 
 // Current GPS Position
 var altitude = 0.0;
@@ -23,9 +26,11 @@ var h_latitude = 0.0;
 
 drone.connect(function() {
   connected = true;
+  drone.MediaStreaming.videoEnable(1);
   printGUI();
 
   drone.GPSSettings.resetHome();
+  //drone.Calibration.magnetoCalibration(1);
   //drone.WifiSettings.outdoorSetting(1);
 
   drone.on("ready", function() {
@@ -59,7 +64,7 @@ drone.connect(function() {
   });
 
   drone.on("battery", function(status){
-    battery = status;
+    battery = status + "%";
     printGUI();
   });
 
@@ -67,6 +72,11 @@ drone.connect(function() {
     h_altitude = pos.altitude;
     h_longitude = pos.longitude;
     h_latitude = pos.latitude;
+    printGUI();
+  });
+
+  drone.on("NumberOfSatelliteChanged", function(num){
+    satellites = num.numberOfSatellite;
     printGUI();
   });
 
@@ -78,9 +88,9 @@ drone.connect(function() {
     console.log("Longitude: " + longitude);
   });*/
 
-  drone.on("GPSFixStateChanged", function(pos){
-    console.log(pos);
-  });
+  //drone.on("GPSFixStateChanged", function(pos){
+  //  console.log(pos);
+  //});
 
   drone.on("PositionChanged", function(pos){
     //console.log(pos);
@@ -89,6 +99,18 @@ drone.connect(function() {
     latitude = pos.latitude;
     printGUI();
   });
+});
+
+process.on('exit', (code) => {
+  drone.Network.disconnect()
+  console.log("Disconnected from the drone");
+  console.log('About to exit with code:', code);
+});
+
+process.on('SIGINT', function() {
+  console.log(" ");
+  console.log("Caught interrupt signal");
+  process.exit();
 });
 
 function printGUI(){
@@ -100,11 +122,17 @@ function printGUI(){
       State: 'Is Connected: ',
       CurrentValue: String(connected)
     }, {
+      State: 'Balance Board Activated: ',
+      CurrentValue: balanceBoardActivated
+    }, {
       State: 'Drohnestatus: ',
       CurrentValue: state
     }, {
       State: 'Battery: ',
       CurrentValue: battery
+    }, {
+      State: 'Satellites: ',
+      CurrentValue: satellites
     }, {
       State: 'GPS: ',
       H: altitude,
@@ -141,5 +169,20 @@ module.exports = {
 
   useGUI: function(value){
     usegui = value;
+  },
+
+  videoEnable: function(){
+    drone.MediaStreaming.videoEnable(1);
+  },
+
+  getStream:  function(){
+    drone.MediaStreaming.videoEnable(1);
+    return drone.getMjpegStream();
+  },
+
+  setBoardActivated: function(val){
+    balanceboardconnected = val;
+    printGUI();
   }
+
 };

@@ -1,42 +1,38 @@
 console.log("STREAM");
+
+"use strict";
+
+var cv = require("opencv");
 var Drone = require('./drone');
 var r = Drone.getAndActivateDrone();
-var cv = require("opencv");
 
-var mjpg = r.getMjpegStream(),
+var mjpg = Drone.getMjpegStream(),
     buf = null,
     w = new cv.NamedWindow("Video", 0);
 
-  console.log("MJpegStream");
+mjpg.on("data", function(data) {
+  buf = data;
+});
 
-  r.connect(function() {
-    console.log("start MediaStreaming");
-    drone.MediaStreaming.videoEnable(1);
-  });
+setInterval(function() {
+  if (buf == null) {
+    return;
+  }
 
-  mjpg.on("data", function(data) {
-    buf = data;
-  });
-
-  setInterval(function() {
-    if (buf == null) {
-      return;
-    }
-
-    try {
-      console.log("cv read Buffer");
-      cv.read(buf, function(err, im) {
-        if (err) {
-          console.log(err);
-        } else {
-          if (im.width() < 1 || im.height() < 1) {
-            return;
-          }
-          w.show(im);
-          w.blockingWaitKey(0, 50);
+  try {
+    cv.readImage(buf, function(err, im) {
+      if (err) {
+        console.log(err);
+      } else {
+        if (im.width() < 1 || im.height() < 1) {
+          console.log("no width or height");
+          return;
         }
-      });
-    } catch(e) {
-      console.log(e);
-    }
-  }, 10);
+        w.show(im);
+        w.blockingWaitKey(0, 50);
+      }
+    });
+  } catch(e) {
+    console.log(e);
+  }
+}, 100);
