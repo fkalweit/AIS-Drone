@@ -1,171 +1,74 @@
-/* Ermöglicht Zugriff auf ddie Drohne.
-Dieser ist der Einfachheit halber immer mit 'r' benannt.
-Drohne ist also r
-*/
+var log = require('./logger').createLogger('Xbox');
 var Drone = require('./drone');
+var Main = require('./main');
+var Gamepad = require("gamepad");
+var Board = require('./balanceboard');
+
 var r = Drone.getAndActivateDrone();
 
-var balanceboardconnected = false;
-var logxboxcontrolleraxes = false;
-var logxboxcontrollerbuttons = false;
 //Drone.useGUI(true);
 //r.MediaStreaming.videoEnable(1);
 
 //var fs = require("fs");
-var gamepad = require("gamepad");
 var net = require('net');
 var split = require('split');
 var mjpgSream = false;
 
-var calibrated = false;
-var axe = -1;
-var calibR = 0.0;
-var calibF = 0.0;
-var calibB = 0.0;
-var calibL = 0.0;
-
 // Initialize the library
-gamepad.init();
+Gamepad.init();
 
 // List the state of all currently attached devices
-for (var i = 0, l = gamepad.numDevices(); i < l; i++) {
-  console.log(i, gamepad.deviceAtIndex());
+for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
+  log.debug(i, Gamepad.deviceAtIndex());
 }
 
 // Create a game loop and poll for events
-setInterval(gamepad.processEvents, 16);
-// Scan for new gamepads as a slower rate
-setInterval(gamepad.detectDevices, 500);
-
-//while(!Drone.isConnected()){
-
-//}
+setInterval(Gamepad.processEvents, 16);
+// Scan for new Gamepads as a slower rate
+setInterval(Gamepad.detectDevices, 500);
 
 
 if(!Drone.isConnected()){
-  console.log("No Drone-Connection");
-}else{
-
+  log.fatal("No Drone-Connection");
 }
 
-var server = net.createServer(function(connection) {
-  console.log("Client connected");
-
-  connection.setEncoding('utf8');
-
-  var stream = connection.pipe(split(JSON.parse));
-
-  stream.on('data', function(data){
-
-    if(balanceboardconnected){
-      if(!Drone.isConnected()){
-        console.log("No Drone-Connection");
-      }else{
-        if(!calibrated){
-          calibrate(data);
-        }else{
-          var massX = data['massX'];
-          var massY = data['massY'];
-
-            if(massX > 0.1){
-              massX = Math.round(massX * 100) * (100 / calibR);
-              //console.log("moving right by: " + massX);
-              r.right(massX);
-            }else if(massX < -0.1){
-              massX = Math.round(massX * -100) * (100 / -calibL);
-              //console.log("moving left by: " + massX);
-              r.left(massX);
-            }else{
-              //r.drone.hover();
-            }
-
-            if(massY > 0.1){
-              massY = Math.round(massY * 100) * (100 / calibB);
-              //console.log("moving backward by: " + massY);
-              r.backward(massY);
-            }else if(massY < -0.1){
-              massY = Math.round(massY * -100) * (100 / -calibF);
-              //console.log("moving forward by: " + massY);
-              r.forward(massY);
-            }else{
-
-              //r.drone.stop();
-            }
-        }
-    }
-  }
-  });
-
-  connection.on ('end', function(status){
-    console.log('Balance Board Disconnected!!!');
-    r.stop();
-  });
-});
-
-server.listen({host: 'localhost', port: 6112, exclusive: true}, () => {
-  address = server.address();
-  console.log('opened server on %j', address);
-});
-
-
-// Listen for move events on all gamepads
-gamepad.on("move", function (id, axis, value) {
+// Listen for move events on all Gamepads
+Gamepad.on("move", function (id, axis, value) {
   if(!Drone.isConnected()){
-    console.log("No Drone-Connection");
+    log.fatal("No Drone-Connection");
   }else{
     switch(axis){
       case 0:
         if(value > 0.15){
           value = Math.round(value * 100);
-
-          if(logxboxcontrolleraxes)
-          console.log("moving right by: " + value);
-
+          log.debug("moving right by: " + value);
           r.right(value);
         }else if(value < -0.15){
           value = Math.round(value * -100);
-
-          if(logxboxcontrolleraxes)
-          console.log("moving left by: " + value);
-
+          log.debug("moving left by: " + value);
           r.left(value);
-        }else{
-          //r.drone.hover();
         }
         break;
       case 1:
         if(value > 0.15){
           value = Math.round(value * 100);
-
-          if(logxboxcontrolleraxes)
-          console.log("moving backward by: " + value);
-
+          log.debug("moving backward by: " + value);
           r.backward(value);
         }else if(value < -0.15){
           value = Math.round(value * -100);
-
           if(logxboxcontrolleraxes)
-          console.log("moving forward by: " + value);
-
+          log.debug("moving forward by: " + value);
           r.forward(value);
-        }else{
-          //r.drone.stop();
         }
         break;
       case 2:
         value = Math.round((value * 50) + 50);
-
-        if(logxboxcontrolleraxes)
-        console.log("lifting up by: " + value);
-
+        log.debug("lifting up by: " + value);
         r.up(value);
         break;
       case 5:
         value = Math.round((value * 50) + 50);
-
-        if(logxboxcontrolleraxes)
-        console.log("sinking down by: " + value);
-
+        log.debug("sinking down by: " + value);
         r.down(value);
         break;
       default: {}
@@ -180,76 +83,65 @@ gamepad.on("move", function (id, axis, value) {
 
 });
 
-// Listen for button up events on all gamepads
-gamepad.on("down", function (id, num) {
+// Listen for button up events on all Gamepads
+Gamepad.on("down", function (id, num) {
   if(!Drone.isConnected()){
-    console.log("No Drone-Connection");
+    log.fatal("No Drone-Connection");
   }else{
     try{
       switch(num) {
         case 0:
-          if(logxboxcontrollerbuttons)
-            console.log("takeoff!");
+          log.debug("takeoff!");
           r.takeOff();
           break;
         case 1:
-          if(logxboxcontrollerbuttons)
-            console.log("reset Home to current Position");
+          log.debug("reset Home to current Position");
           Drone.setCurrentPositionToHome();
           break;
         case 2:
-          if(logxboxcontrollerbuttons)
-            console.log("hovering...");
+          log.debug("hovering...");
           r.stop();
           break;
         case 3:
-          if(logxboxcontrollerbuttons)
-            console.log("landing...");
+          log.debug("landing...");
           r.land();
           break;
         case 4:
-          if(logxboxcontrollerbuttons)
-            console.log("counterclockwise -> 30");
+          log.debug("counterclockwise -> 30");
           r.counterClockwise(30);
           break;
         case 5:
-          if(logxboxcontrollerbuttons)
-            console.log("clockwise -> 30");
+          log.debug("clockwise -> 30");
           r.clockwise(30);
           break;
         case 6:
-          if(logxboxcontrollerbuttons)
-            console.log("returning Home...home...sweet home");
+          log.debug("returning Home...home...sweet home");
           r.Piloting.navigateHome(1);
           break;
         case 7:
-          if(logxboxcontrollerbuttons)
-            console.log("aborted flying home...");
+          log.debug("aborted flying home...");
           r.Piloting.navigateHome(0);
           break;
         case 8:
-          if(logxboxcontrollerbuttons)
-            console.log("EMERGENCY!");
+          log.debug("EMERGENCY!");
           r.emergency();
           break;
         case 9:
-          balanceboardconnected = true;
-          if(logxboxcontrollerbuttons)
-            console.log("Balance Board Aktiviert");
-            break;
+          Board.enableBoard();
+          log.debug("Balance Board Aktiviert");
+          break;
         case 10:
-          if(logxboxcontrollerbuttons)
-            console.log("Balance Board Deaktiviert");
-          balanceboardconnected = false;
+          log.debug("Balance Board Deaktiviert");
+          Board.disableBoard();
           r.stop();
-          if(logxboxcontrollerbuttons)
-            console.log("Hovering...");
+          log.debug("Hovering...");
           break;
         default:
         r.land();
       }
     }catch (e){
       r.land();
+      log.error("Landing because of Exception");
     }
   }
 
@@ -259,20 +151,18 @@ gamepad.on("down", function (id, num) {
   });
 });
 
-  gamepad.on("up", function (id, num) {
+  Gamepad.on("up", function (id, num) {
     if(!Drone.isConnected()){
-      console.log("No Drone-Connection");
+      log.fatal("No Drone-Connection");
     }else{
       try{
         switch(num) {
           case 4:
-            if(logxboxcontrollerbuttons)
-              console.log("counterclockwise -> 0");
+            log.debug("counterclockwise -> 0");
             r.counterClockwise(0);
             break;
           case 5:
-            if(logxboxcontrollerbuttons)
-              console.log("clockwise -> 0");
+            log.debug("clockwise -> 0");
             r.clockwise(0);
             break;
           default:
@@ -280,6 +170,7 @@ gamepad.on("down", function (id, num) {
         }
       }catch (e){
         r.land();
+        log.debug("Landing because of Exception");
       }
     }
   });
@@ -287,8 +178,6 @@ gamepad.on("down", function (id, num) {
 
 setTimeout(function(){
 if (mjpgSream) {
-
-
   console.log(mjpgSream);
   var cv = require("opencv");
 
@@ -308,10 +197,10 @@ if (mjpgSream) {
     try {
       cv.readImage(buf, function(err, im) {
         if (err) {
-          console.log(err);
+          log.error(err);
         } else {
           if (im.width() < 1 || im.height() < 1) {
-            console.log("no width or height");
+            log.info("no width or height");
             return;
           }
           w.show(im);
@@ -319,83 +208,22 @@ if (mjpgSream) {
         }
       });
     } catch(e) {
-      console.log(e);
+      console.error(e);
     }
   }, 80);
 }
 }, 1000);
-// Listen for button down events on all gamepads
-gamepad.on("down", function (id, num) {
+// Listen for button down events on all Gamepads
+Gamepad.on("down", function (id, num) {
   console.log("down", {
     id: id,
     num: num,
   });
 });
 
-function calibrate(data){
-  if(axe == -1){
-    startCalibInterval();
-  }
-
-  var massX = data['massX'] * 100;
-  var massY = data['massY'] * 100;
-
-    if(massX > 0.1 && axe == 0){
-      calibR = max(massX, calibR);
-      console.log("R-Max: " + calibR);
-    }else if(massX < -0.1 && axe == 1){
-      calibL = min(massX, calibL);
-      console.log("L-Max: " + calibL);
-    }else{
-      //r.drone.hover();
-    }
-
-    if(massY > 0.1 && axe == 2){
-      calibB = max(massY, calibB);
-      console.log("B-Max: " + calibB);
-    }else if(massY < -0.1 && axe == 3){
-      calibF = min(massY, calibF);
-      console.log("F-Max: " + calibF);
-    }else{
-      //r.drone.stop();
-    }
-}
-
-function startCalibInterval(){
-  axe++;
-  console.log("Achse: " + axe + " wird kalibriert");
-  setTimeout(function () {
-    if(axe < 3){
-      startCalibInterval();
-    }else if(axe >= 3){
-      calibrated = true;
-    }
-  }, 5000);
-}
-
-function max(a, b){
-  if(a > b){
-    return a;
-  }else{
-    return b;
-  }
-}
-
-function min(a, b){
-  if(a > b){
-    return b;
-  }else{
-    return a;
-  }
-}
-
 module.exports = {
-log_level: function(value){
-  logxboxcontrolleraxes = value;
-  logxboxcontrollerbuttons = value;
-},
 start_stream: function(value){
-    console.log("start stream");
+    log.info("start stream");
     mjpgSream = value;
   }
 };

@@ -1,3 +1,5 @@
+var log = require('./logger').createLogger('Drone');
+
 var Bebop = require('node-bebop');
 
 // Zum installieren: npm install console.table --save
@@ -7,8 +9,6 @@ var usegui = false;
 
 var drone = Bebop.createClient();
 var connected = false;
-
-var balanceBoardActivated = false;
 
 var battery = "not set yet";
 var state = "";
@@ -24,60 +24,52 @@ var h_altitude = 0.0;
 var h_longitude = 0.0;
 var h_latitude = 0.0;
 
+setInterval(function () {
+  printGUI();
+}, 500);
+
 drone.connect(function() {
   connected = true;
   drone.MediaStreaming.videoEnable(1);
-  printGUI();
 
   drone.GPSSettings.resetHome();
-  //drone.Calibration.magnetoCalibration(1);
-  //drone.WifiSettings.outdoorSetting(1);
 
   drone.on("ready", function() {
     state = "ready";
-    printGUI();
   });
 
   drone.on("flying", function(derp){
     state = "flying";
-    printGUI();
   });
 
   drone.on("landed", function() {
     state = "landed";
-    printGUI();
   });
 
   drone.on("landing", function() {
     state = "landing";
-    printGUI();
   });
 
   drone.on("hovering", function() {
     state = "hovering";
-    printGUI();
   });
 
   drone.on("takingOff", function(){
     state = "takingOff";
-    printGUI();
   });
 
   drone.on("battery", function(status){
     battery = status + "%";
-    printGUI();
   });
 
   drone.on("HomeChanged", function(pos){
     h_altitude = pos.altitude;
     h_longitude = pos.longitude;
     h_latitude = pos.latitude;
-    printGUI();
   });
 
   drone.on("NumberOfSatelliteChanged", function(num){
     satellites = num.numberOfSatellite;
-    printGUI();
   });
 
   /*drone.on("AltitudeChanged", function(altitude){
@@ -97,7 +89,6 @@ drone.connect(function() {
     altitude = pos.altitude;
     longitude = pos.longitude;
     latitude = pos.latitude;
-    printGUI();
   });
 });
 
@@ -122,8 +113,12 @@ function printGUI(){
       State: 'Is Connected: ',
       CurrentValue: String(connected)
     }, {
+      State: 'Balance Board Connected: ',
+      CurrentValue: boardConnected
+    },
+    {
       State: 'Balance Board Activated: ',
-      CurrentValue: balanceBoardActivated
+      CurrentValue: boardActivated
     }, {
       State: 'Drohnestatus: ',
       CurrentValue: state
@@ -180,9 +175,12 @@ module.exports = {
     return drone.getMjpegStream();
   },
 
-  setBoardActivated: function(val){
+  setBoardConnected: function(val){
     balanceboardconnected = val;
-    printGUI();
+  },
+
+  setBoardActivated: function(val){
+    boardActivated = val;
   }
 
 };

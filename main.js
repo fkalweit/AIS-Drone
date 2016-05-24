@@ -2,9 +2,8 @@ var stream = false;
 var gui = true;
 var log = false;
 
-var Drone = require('./drone');
-var Table = require('console.table');
-var r = Drone.getAndActivateDrone();
+var loglevel = 20;
+var withgui = true;
 
 process.argv.forEach(function (val, index, array) {
   //console.log(index + ': ' + val);   // Für Debug des switch
@@ -20,10 +19,11 @@ process.argv.forEach(function (val, index, array) {
       break;
     case "-v":
     case "--verbose":
-      log = true;
+      loglevel = 10;
+      withgui = false;
       break;
     case "--no-ui":
-      gui = false;
+      withgui = false;
       break;
     default:
     return 0;
@@ -31,23 +31,28 @@ process.argv.forEach(function (val, index, array) {
 });
 
 
+// trace = 10, debug = 20, info = 30, warn = 40, error = 50, fatal = 60
+// To use the Logger do:
+// var logger = require('./logger').createLogger(< modul_name >, [<log_level>]);
+// if no log_level is passed, the previous set will be used. 
+// Then u can do log.x for x € [trace, debug, info, warn, error, fatal]
+var log = require('./logger').createLogger('Main', loglevel);
+
+var Drone = require('./drone');
+var Controller = require('./xbox');
+var Table = require('console.table');
+var r = Drone.getAndActivateDrone();
+
 setTimeout(function() {
 //DEFAULT: start xbox with ui without log + no stream
 if(!Drone.isConnected()){
-  console.log("No Drone-Connection");
+  log.fatal("No Drone-Connection");
 }else{
 
-  r.MediaStreaming.videoEnable(true);
+  r.MediaStreaming.videoEnable(1);
 
-  if(gui) Drone.useGUI(true);
-  var xbox = require('./xbox');
-  if(stream) xbox.start_stream(true);
-  if (log) {
-    xbox.log_level(true);
-  }
-  else {
-    xbox.log_level(false);
-  }
+  Drone.useGUI(withgui);
+  if(stream) Controller.start_stream(true);
   //if(stream) var MJpegStream = require('./mjpeg');
 }
   }, 1000);
@@ -72,7 +77,7 @@ function printHelp(){
     {
       OPTION: '-v',
       OPTION2: '--verbose',
-      DESCRIPTION: 'Prints debug log on stdout'
+      DESCRIPTION: 'Prints debug log on stdout and disables the GUI'
     },
     {
       OPTION2: '--no-ui',
