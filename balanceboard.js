@@ -2,6 +2,7 @@ var log = require('./logger').createLogger('Board');
 var net = require('net');
 var split = require('split');
 var Drone = require('./drone');
+var r = Drone.getAndActivateDrone();
 
 var calibrated = false;
 var axe = -1;
@@ -25,7 +26,7 @@ var server = net.createServer(function(connection) {
   var stream = connection.pipe(split(JSON.parse));
 
   stream.on('data', function(data){
-    balanceboardconnected = true;
+    boardConnected = true;
     Drone.setBoardConnected(true);
 
     if(boardConnected && boardActivated){
@@ -136,6 +137,7 @@ module.exports = {
   enableBoard: function(){
     if(boardConnected){
       boardActivated = true;
+      Drone.setBoardConnected(true);
       Drone.setBoardActivated(true);
     }else{
       log.error('Can not activate board, because it is not connected');

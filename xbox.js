@@ -56,7 +56,6 @@ Gamepad.on("move", function (id, axis, value) {
           r.backward(value);
         }else if(value < -0.15){
           value = Math.round(value * -100);
-          if(logxboxcontrolleraxes)
           log.debug("moving forward by: " + value);
           r.forward(value);
         }

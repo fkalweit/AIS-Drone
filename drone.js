@@ -10,6 +10,9 @@ var usegui = false;
 var drone = Bebop.createClient();
 var connected = false;
 
+var boardConnected = false;
+var boardActivated = false;
+
 var battery = "not set yet";
 var state = "";
 var satellites = "";
