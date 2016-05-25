@@ -179,7 +179,7 @@ module.exports = {
   },
 
   setBoardConnected: function(val){
-    balanceboardconnected = val;
+    boardConnected = val;
   },
 
   setBoardActivated: function(val){
