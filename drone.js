@@ -169,17 +169,7 @@ function printGUI(){
     }, {
       State: 'Balance Board Connected: ',
       CurrentValue: boardConnected
-    },
-    {
-      State: 'DistanceFromHome: ',
-      CurrentValue: currentDistanceFromHome
     }, {
-      State: 'OutOfArea: ',
-      CurrentValue: isOutOfArea
-    }, {
-      State: 'OutOfAreaContextState: ',
-      CurrentValue: OutOfAreaContextState
-	}, {
       State: 'Balance Board Activated: ',
       CurrentValue: boardActivated
     }, {
@@ -201,6 +191,15 @@ function printGUI(){
       H: h_altitude,
       L: h_longitude,
       B: h_latitude
+    }, {
+      State: 'DistanceFromHome: ',
+      CurrentValue: currentDistanceFromHome
+    }, {
+      State: 'OutOfArea: ',
+      CurrentValue: isOutOfArea
+    }, {
+      State: 'OutOfAreaContextState: ',
+      CurrentValue: OutOfAreaContextState
     }
   ]);
 
