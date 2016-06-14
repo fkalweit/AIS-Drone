@@ -1,8 +1,11 @@
+//Geofencing-Variablen - Start
 var distanceCalc = require('./GpsDistanceCalculator');
 var areaRadiusInMeter = 10.5;
 var isOutOfArea = false;
 var currentDistanceFromHome = -1;
 var OutOfAreaContextState = "";
+//Geofencing-Variablen - Ende
+
 var Bebop = require('node-bebop');
 
 // Zum installieren: npm install console.table --save
@@ -102,12 +105,12 @@ drone.connect(function() {
     altitude = pos.altitude;
     longitude = pos.longitude;
     latitude = pos.latitude;
-	
-	
-	
+
+
+
 
 	if(!((h_longitude==0)&&(h_latitude==0))){
-		
+
 		var lastDistanceFromHome = currentDistanceFromHome
 		currentDistanceFromHome = distanceCalc.getDistanceInMeter(h_latitude, h_longitude, latitude, longitude);
 
@@ -115,9 +118,9 @@ drone.connect(function() {
 		var wasOutOfArea = isOutOfArea;
 		isOutOfArea = (currentDistanceFromHome > areaRadiusInMeter);
 
-		OutOfAreaContextState="unknown"; 
-		
-		 
+		OutOfAreaContextState="unknown";
+
+
 		if(isOutOfArea){
 			if(wasOutOfArea){
 				if(Math.abs(lastDistanceFromHome - currentDistanceFromHome) > 1 ){ //erst nach einer Mindestbewegung prüfen in welche Richtung die Drohne fliegt
@@ -131,19 +134,19 @@ drone.connect(function() {
 				}else{
 					//OutOfAreaContextState="geringe Bewegung";
 				}
-			
+
 			}else{
 				console.log("Drone leaves Area")
 				OutOfAreaContextState="hat_Bereich_verlassen";
 				drone.stop();
 			}
 		}
-		
+
 	}
 
 
-	
-	
+
+
     printGUI();
   });
 });
