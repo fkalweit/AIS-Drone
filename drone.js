@@ -10,9 +10,6 @@ var log = require('./logger').createLogger('Drone');
 
 var Bebop = require('node-bebop');
 
-var clui  = require('clui');
-var clc = require('cli-color');
-
 // Zum installieren: npm install console.table --save
 var Table = require('console.table');
 

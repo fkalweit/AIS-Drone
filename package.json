@@ -43,7 +43,9 @@
 		"net": ">=1.0.2",
     "split": ">=1.0.0",
 		"bunyan": ">=1.8.1",
-		"bunyan-prettystream": ">=0.1.3"
+		"bunyan-prettystream": ">=0.1.3",
+		"cylon": "1.3.0",
+		"cylon-keyboard": ">=0.17.0"
 	},
 	"private": true,
 	"engine": "node ~0.4.0"
