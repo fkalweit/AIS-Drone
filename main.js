@@ -45,22 +45,23 @@ var Drone = require('./drone');
 var r = Drone.getAndActivateDrone();
 
 setTimeout(function() {
-//DEFAULT: start xbox with ui without log + no stream
-if(!Drone.isConnected()){
-  log.fatal("No Drone-Connection");
-}else{
+  //DEFAULT: start xbox with ui without log + no stream
+  if(!Drone.isConnected()){
+    log.fatal("No Drone-Connection");
+  }else{
 
-  var Controller = require('./xbox');
+    r.MediaStreaming.videoEnable(1);
+    
+    Drone.useGUI(withgui);
 
-  var Keyboard = require('./keyboard');
+    var Controller = require('./xbox');
 
-  r.MediaStreaming.videoEnable(1);
+    var Keyboard = require('./keyboard');
 
-  Drone.useGUI(withgui);
-  if(stream) Controller.start_stream(true);
-  //if(stream) var MJpegStream = require('./mjpeg');
-}
-  }, 1500);
+    if(stream) Controller.start_stream(true);
+    //if(stream) var MJpegStream = require('./mjpeg');
+  }
+}, 1500);
 
 function printHelp(){
 
@@ -77,7 +78,7 @@ function printHelp(){
     {
       OPTION: '-s',
       OPTION2: '--stream',
-      DESCRIPTION: 'Streams MJpeg from drone'
+      DESCRIPTION: 'Streams MJpeg from drone (only on Unix)'
     },
     {
       OPTION: '-v',
