@@ -35,12 +35,12 @@ var h_altitude = 0.0;
 var h_longitude = 0.0;
 var h_latitude = 0.0;
 
-if(usegui){
+
   setInterval(function () {
-    printGUI();
+   if(usegui) printGUI();
   }, 500);
 
-}
+
 drone.connect(function() {
   connected = true;
   drone.MediaStreaming.videoEnable(1);

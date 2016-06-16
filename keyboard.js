@@ -8,6 +8,8 @@ var Cylon = require('cylon');
 */
 var Drone = require('./drone');
 
+var Gamepad = require("gamepad");
+
 //====================== CODE ======================
 
 var r = Drone.getAndActivateDrone();
@@ -78,6 +80,18 @@ Cylon.robot({
       console.log("SetHome");
       Drone.setCurrentPositionToHome();
     });
+
+  k.keyboard.on('f', function(key) {
+        console.log("shutdown gamepad");
+        Gamepad.shutdown();
+    });
+
+    k.keyboard.on('g', function(key) {
+          console.log("init gamepad");
+          Gamepad.detectDevices();
+      });
+
+
 
 	// k.keyboard.on('p', function(key) {
   //     console.log("DISCONNECT");

@@ -174,6 +174,21 @@ Gamepad.on("down", function (id, num) {
     }
   });
 
+  Gamepad.on("remove", function (id, num) {
+    if(!Drone.isConnected()){
+      log.fatal("No Drone-Connection");
+    }else{
+      try{
+        log.debug("Landing ... no Controller");
+        console.log("STOPPPPPPPPPPPPPP");
+        r.land();
+      }catch (e){
+        r.land();
+        log.debug("Landing because of Exception");
+      }
+    }
+  });
+
 
 setTimeout(function(){
 if (mjpgSream) {
