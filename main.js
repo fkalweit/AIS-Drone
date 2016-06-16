@@ -5,6 +5,8 @@ var log = false;
 var loglevel = 20;
 var withgui = true;
 
+var Table = require('console.table');
+
 process.argv.forEach(function (val, index, array) {
   //console.log(index + ': ' + val);   // Für Debug des switch
   switch (val) {
@@ -34,13 +36,12 @@ process.argv.forEach(function (val, index, array) {
 // trace = 10, debug = 20, info = 30, warn = 40, error = 50, fatal = 60
 // To use the Logger do:
 // var logger = require('./logger').createLogger(< modul_name >, [<log_level>]);
-// if no log_level is passed, the previous set will be used. 
+// if no log_level is passed, the previous set will be used.
 // Then u can do log.x for x € [trace, debug, info, warn, error, fatal]
 var log = require('./logger').createLogger('Main', loglevel);
 
 var Drone = require('./drone');
-var Controller = require('./xbox');
-var Table = require('console.table');
+
 var r = Drone.getAndActivateDrone();
 
 setTimeout(function() {
@@ -49,13 +50,17 @@ if(!Drone.isConnected()){
   log.fatal("No Drone-Connection");
 }else{
 
+  var Controller = require('./xbox');
+
+  var Keyboard = require('./keyboard');
+
   r.MediaStreaming.videoEnable(1);
 
   Drone.useGUI(withgui);
   if(stream) Controller.start_stream(true);
   //if(stream) var MJpegStream = require('./mjpeg');
 }
-  }, 1000);
+  }, 1500);
 
 function printHelp(){
 

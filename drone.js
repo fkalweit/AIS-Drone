@@ -13,7 +13,7 @@ var Bebop = require('node-bebop');
 // Zum installieren: npm install console.table --save
 var Table = require('console.table');
 
-var usegui = true;
+var usegui = false;
 
 var drone = Bebop.createClient();
 var connected = false;
@@ -35,10 +35,12 @@ var h_altitude = 0.0;
 var h_longitude = 0.0;
 var h_latitude = 0.0;
 
-setInterval(function () {
-  printGUI();
-}, 500);
+if(usegui){
+  setInterval(function () {
+    printGUI();
+  }, 500);
 
+}
 drone.connect(function() {
   connected = true;
   drone.MediaStreaming.videoEnable(1);
@@ -102,8 +104,6 @@ drone.connect(function() {
     latitude = pos.latitude;
 
 
-
-
 	if(!((h_longitude==0)&&(h_latitude==0))){
 
 		var lastDistanceFromHome = currentDistanceFromHome
@@ -139,10 +139,6 @@ drone.connect(function() {
 
 	}
 
-
-
-
-    printGUI();
   });
 });
 
@@ -221,7 +217,6 @@ module.exports = {
 
   setCurrentPositionToHome: function(){
     drone.GPSSettings.setHome(latitude, longitude, altitude);
-    printGUI();
   },
 
   useGUI: function(value){
