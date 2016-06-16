@@ -10,10 +10,13 @@ var log = require('./logger').createLogger('Drone');
 
 var Bebop = require('node-bebop');
 
+var clui  = require('clui');
+var clc = require('cli-color');
+
 // Zum installieren: npm install console.table --save
 var Table = require('console.table');
 
-var usegui = false;
+var usegui = true;
 
 var drone = Bebop.createClient();
 var connected = false;
@@ -36,9 +39,52 @@ var h_longitude = 0.0;
 var h_latitude = 0.0;
 
 
-  setInterval(function () {
-   if(usegui) printGUI();
-  }, 500);
+// setInterval(function () {
+//      if(usegui) printGUI();
+// }, 500);
+
+// var out = process.stdout;
+// var numOfLinesToClear = 13;
+// out.write("1\n");   // prints `1` and new line
+// ++numOfLinesToClear;
+// out.write("2\n");
+// ++numOfLinesToClear;
+// process.stdout.moveCursor(0,-numOfLinesToClear); //move the cursor to first line
+// setTimeout(function () {
+//     process.stdout.clearLine();
+//     out.cursorTo(0);            // moves the cursor at the beginning of line
+//     out.write("3");             // prints `3`
+//     out.write("\n4");           // prints new line and `4`
+//     console.log();
+// }, 1000);
+
+setTimeout(function () {
+  console.log('\033[2J');
+  //if(usegui) printGUI();
+   setInterval(function() {
+      // for (var i = 0; i < 10; i++) {
+
+        process.stdout.cursorTo(0,-1);  // move cursor to beginning of line
+        process.stdout.clearLine();  // clear current text
+      //  }
+       if(usegui) printGUI();
+
+   }, 500);
+},3000)
+
+
+// var i = 0;  // dots counter
+// setInterval(function() {
+//   process.stdout.clearLine();  // clear current text
+//   process.stdout.cursorTo(0);  // move cursor to beginning of line
+//   i = (i + 1) % 4;
+//   var dots = new Array(i + 1).join(".");
+//   process.stdout.write("Waiting" + dots);  // write text
+// }, 300);
+
+// setTimeout(function (){
+//   printGUI();
+// },500)
 
 
 drone.connect(function() {
@@ -155,8 +201,17 @@ process.on('SIGINT', function() {
 });
 
 function printGUI(){
+
+
+
+
   if(usegui){
-    console.log('\033[2J');
+
+
+    //var clear = require("cli-clear");
+
+    //clear();
+    //console.log('\033[2J');
 
     console.table([
     {
