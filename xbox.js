@@ -1,10 +1,9 @@
 var log = require('./logger').createLogger('Xbox');
 var Drone = require('./drone');
-var Main = require('./main');
 var Gamepad = require("gamepad");
 var Board = require('./balanceboard');
 
-var r = Drone.getAndActivateDrone();
+//var r = Drone.getAndActivateDrone();
 
 //Drone.useGUI(true);
 //r.MediaStreaming.videoEnable(1);
@@ -241,6 +240,6 @@ start_stream: function(value){
     mjpgSream = value;
   },
 setDrone: function(value){
-  r = value;
+    r = value;
 }
 };

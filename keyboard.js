@@ -10,9 +10,9 @@ var Drone = require('./drone');
 
 var Gamepad = require("gamepad");
 
+
 //====================== CODE ======================
 
-var r = Drone.getAndActivateDrone();
 
 Cylon.robot({
   connections: {
@@ -81,15 +81,29 @@ Cylon.robot({
       Drone.setCurrentPositionToHome();
     });
 
-  k.keyboard.on('f', function(key) {
-        console.log("shutdown gamepad");
+  k.keyboard.on('1', function(key) {
+        console.log("gamepad");
         Gamepad.shutdown();
+        //TODO
     });
 
-    k.keyboard.on('g', function(key) {
-          console.log("init gamepad");
-          Gamepad.detectDevices();
+  k.keyboard.on('2', function(key) {
+          console.log("balance board");
+          //TODO
       });
+  k.keyboard.on('left', function(key) {
+              console.log("counterclockwise");
+                r.counterClockwise(30);
+  });
+  k.keyboard.on('right', function(key) {
+              console.log("clockwise");
+              r.Clockwise(30);
+  });
+  k.keyboard.on('end', function(key) {
+              console.log("quit");
+              process.exit(0);
+  });
+
 
 
 
@@ -101,8 +115,10 @@ Cylon.robot({
   }
 }).start();
 
+// Export-Methoden des Moduls.
+// Ermöglicht Aufruf der Drohne und anderer Funktionen in anderen Modulen.
 module.exports = {
-setDrone: function(value){
-  r = value;
-}
+  setDrone: function(value) {
+    r = value;
+  }
 };
