@@ -14,7 +14,7 @@ console.log(Main.controllerActivated);
 //var fs = require("fs");
 var net = require('net');
 var split = require('split');
-var mjpgSream = false;
+var mjpgStream = false;
 
 // Initialize the library
 Gamepad.init();
@@ -201,8 +201,8 @@ Gamepad.on("remove", function(id, num) {
 
 
 setTimeout(function() {
-  if (mjpgSream) {
-    console.log(mjpgSream);
+  if (mjpgStream) {
+    console.log(mjpgStream);
     var cv = require("opencv");
 
     var mjpg = r.getMjpegStream(),
@@ -250,7 +250,7 @@ Gamepad.on("down", function(id, num) {
 module.exports = {
   start_stream: function(value) {
     log.info("start stream");
-    mjpgSream = value;
+    mjpgStream = value;
   },
   setDrone: function(value) {
     r = value;
