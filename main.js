@@ -8,6 +8,8 @@ var controllerActivated = false;
 var balanceBoardActivated = false;
 var joystickActivated = false;
 
+var raceModeAvtive = false;
+
 var boardConnected = false;
 
 var Table = require('console.table');
@@ -34,8 +36,6 @@ process.argv.forEach(function(val, index, array) {
     if (array.length == 2) {
         return 0;
     }
-    console.log("array " + array.length + " index: " + index + " val " + val);
-    console.log(val);
     switch (val) {
         case "-?":
         case "--help":
@@ -58,7 +58,11 @@ process.argv.forEach(function(val, index, array) {
         case "-l":
         case "--log":
             loglevel = parseInt(array[index + 1]);
-            //console.log(parseInt(array[index + 1]));
+            array.splice(index, 1);
+            break;
+          case "-m":
+          case "--modus":
+            raceModeAvtive = parseInt(array[index + 1]);
             array.splice(index, 1);
             break;
         case "--no-ui":
@@ -123,7 +127,6 @@ setTimeout(function() {
     }
     console.log('\033[2J');
     setInterval(function() {
-      console.log(Drone.getState());
         if (withgui) {
             process.stdout.cursorTo(0, -1); // move cursor to beginning of line
             process.stdout.clearLine(); // clear current text
