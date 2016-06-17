@@ -27,7 +27,7 @@ process.on('SIGINT', function() {
   console.log(" ");
   console.log("Caught interrupt signal");
   process.exit();
-}); 
+});
 
 process.argv.forEach(function(val, index, array) {
     //console.log(index + ': ' + val);   // Für Debug des switch
@@ -37,7 +37,7 @@ process.argv.forEach(function(val, index, array) {
     console.log("array " + array.length + " index: " + index + " val " + val);
     console.log(val);
     switch (val) {
-        case "-h":
+        case "-?":
         case "--help":
             printHelp();
             process.exit(0);
@@ -58,7 +58,7 @@ process.argv.forEach(function(val, index, array) {
         case "-l":
         case "--log":
             loglevel = parseInt(array[index + 1]);
-            console.log(parseInt(array[index + 1]));
+            //console.log(parseInt(array[index + 1]));
             array.splice(index, 1);
             break;
         case "--no-ui":
@@ -66,7 +66,7 @@ process.argv.forEach(function(val, index, array) {
             break;
         default:
             if (index > 1) {
-                console.log("unknown arg");
+                log.error("Unknown arg.");
                 process.exit(0);
             }
     }
@@ -84,19 +84,24 @@ var Keyboard = require('./keyboard');
 
 var Controller = require('./xbox')
 
-var spawn = require("child_process").spawn;
-var myapp = spawn('java', ['-jar', 'WiiRemoteJ.jar']);
-        myapp.stdout.on('data', function (data) {
-            log.debug(data.toString());
-        });
+if (os.platform() == "win32" || os.platform() == "win64") {
+  log.info("WiiRemote does not work with Windows.")
+}
+else {
+  var spawn = require("child_process").spawn;
+  var myapp = spawn('java', ['-jar', 'WiiRemoteJ.jar']);
+          myapp.stdout.on('data', function (data) {
+              log.debug(data.toString());
+          });
 
-        myapp.stderr.on('data', function (data) {
-            log.debug(data.toString());
-        });
+          myapp.stderr.on('data', function (data) {
+              log.debug(data.toString());
+          });
 
-        myapp.on('exit', function (code) {
-            log.debug('child process exited with code ' + code);
-        });
+          myapp.on('exit', function (code) {
+              log.debug('child process exited with code ' + code);
+          });
+}
 
 
 var r = Drone.getAndActivateDrone();
@@ -181,7 +186,7 @@ function printHelp() {
     console.log("Controle a connected Bebop2 with Xbox-Controller.");
     console.log("On default the console-ui is activated.\n");
     console.table([{
-        OPTION: '-h',
+        OPTION: '-?',
         OPTION2: '--help',
         DESCRIPTION: 'Prints this table'
     }, {
