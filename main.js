@@ -1,9 +1,14 @@
 var stream = false;
-var gui = true;
 var log = false;
 
 var loglevel = 20;
 var withgui = true;
+
+var controllerActivated = false;
+var balanceBoardActivated = false;
+var joystickActivated = false;
+var controllerActivated = false;
+
 
 var Table = require('console.table');
 
@@ -51,7 +56,7 @@ setTimeout(function() {
   }else{
 
     r.MediaStreaming.videoEnable(1);
-    
+
     Drone.useGUI(withgui);
 
     var Controller = require('./xbox');
