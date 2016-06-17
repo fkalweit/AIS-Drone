@@ -70,7 +70,39 @@ var Keyboard = require('./keyboard');
 
 var Controller = require('./xbox')
 
+var spawn = require("child_process").spawn;
+var myapp = spawn('java', ['-jar', 'WiiRemoteJ.jar']);
+        myapp.stdout.on('data', function (data) {
+            log.debug(data.toString());
+        });
+
+        myapp.stderr.on('data', function (data) {
+            log.debug(data.toString());
+        });
+
+        myapp.on('exit', function (code) {
+            log.debug('child process exited with code ' + code);
+        });
+
 var r = Drone.getAndActivateDrone();
+
+process.on('exit', (code) => {
+  r.Network.disconnect();
+  myapp.kill('SIGKILL');
+  console.log("Disconnected from the drone");
+  console.log('About to exit with code:', code);
+});
+
+process.on('SIGINT', function() {
+  r.Network.disconnect();
+  myapp.kill('SIGKILL');
+  console.log(" ");
+  console.log("Caught interrupt signal");
+  process.exit();
+});
+
+
+
 
 setTimeout(function() {
     //DEFAULT: start xbox with ui without log + no stream
