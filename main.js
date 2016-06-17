@@ -57,7 +57,6 @@ process.argv.forEach(function(val, index, array) {
     }
 });
 
-
 // trace = 10, debug = 20, info = 30, warn = 40, error = 50, fatal = 60
 // To use the Logger do:
 // var logger = require('./logger').createLogger(< modul_name >, [<log_level>]);
@@ -110,34 +109,26 @@ setTimeout(function() {
 
         r.MediaStreaming.videoEnable(1);
 
-        Drone.useGUI(withgui);
-
         Controller.setDrone(r);
-
-        Drone.useGUI(withgui);
 
         Keyboard.setDrone(r);
 
         if (stream) Controller.start_stream(true);
         //if(stream) var MJpegStream = require('./mjpeg');
     }
-}, 1500);
-
-setTimeout(function() {
     console.log('\033[2J');
     setInterval(function() {
+      console.log(Drone.getState());
         if (withgui) {
             process.stdout.cursorTo(0, -1); // move cursor to beginning of line
             process.stdout.clearLine(); // clear current text
             printGUI();
         }
     }, 200);
-}, 3000)
+
+}, 1500);
 
 function printGUI() {
-
-    if (withgui) {
-
         console.table([{
             State: 'Is Connected: ',
             CurrentValue: String(Drone.isConnected())
@@ -179,7 +170,7 @@ function printGUI() {
 
         console.log("\r\n");
         console.log("\r\n");
-    }
+
 };
 
 
