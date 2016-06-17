@@ -14,6 +14,21 @@ var Table = require('console.table');
 var os = require('os');
 var log = require('./logger').createLogger('Main', loglevel);
 
+process.on('exit', (code) => {
+  r.Network.disconnect();
+  myapp.kill('SIGKILL');
+  console.log("Disconnected from the drone");
+  console.log('About to exit with code:', code);
+});
+
+process.on('SIGINT', function() {
+  r.Network.disconnect();
+  myapp.kill('SIGKILL');
+  console.log(" ");
+  console.log("Caught interrupt signal");
+  process.exit();
+}); 
+
 process.argv.forEach(function(val, index, array) {
     //console.log(index + ': ' + val);   // Für Debug des switch
     if (array.length == 2) {
@@ -85,21 +100,6 @@ var myapp = spawn('java', ['-jar', 'WiiRemoteJ.jar']);
 
 
 var r = Drone.getAndActivateDrone();
-
-process.on('exit', (code) => {
-  r.Network.disconnect();
-  myapp.kill('SIGKILL');
-  console.log("Disconnected from the drone");
-  console.log('About to exit with code:', code);
-});
-
-process.on('SIGINT', function() {
-  r.Network.disconnect();
-  myapp.kill('SIGKILL');
-  console.log(" ");
-  console.log("Caught interrupt signal");
-  process.exit();
-}); 
 
 setTimeout(function() {
     //DEFAULT: start xbox with ui without log + no stream
