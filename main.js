@@ -296,10 +296,15 @@ function printHelp() {
 
 };
 
+module.exports.controllerActivated = controllerActivated;
 
 // Export-Methoden des Moduls.
 // Ermöglicht Aufruf der Funktionen in anderen Modulen.
 module.exports = {
+
+  // evtl. Variablen direkt im Export
+
+
     getControllerActivated: function() {
         return controllerActivated;
     },

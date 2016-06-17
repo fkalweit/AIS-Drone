@@ -10,6 +10,8 @@ var Drone = require('./drone');
 
 var Gamepad = require("gamepad");
 
+var Main = require('./main');
+
 var log = require('./logger').createLogger('Keyboard');
 
 //====================== CODE ======================
@@ -82,15 +84,14 @@ Cylon.robot({
       Drone.setCurrentPositionToHome();
     });
 
-  k.keyboard.on('f', function(key) {
-        log.info("shutdown gamepad");
-        Gamepad.shutdown();
+  k.keyboard.on('1', function(key) {
+        log.info("toggle gamepad");
+        Main.controllerActivated = !Main.controllerActivated;
         //TODO
     });
 
-    k.keyboard.on('g', function(key) {
-          log.info("init gamepad");
-          Gamepad.detectDevices();
+    k.keyboard.on('0', function(key) {
+          //TODO
       });
   k.keyboard.on('left', function(key) {
               console.log("counterclockwise");
