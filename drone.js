@@ -241,7 +241,7 @@ module.exports = {
     },
 
     getSatellites: function() {
-        return getSatellites;
+        return satellites;
     },
 
     getBattery: function() {

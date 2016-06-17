@@ -68,6 +68,8 @@ var Drone = require('./drone');
 
 var Keyboard = require('./keyboard');
 
+var Controller = require('./xbox')
+
 var r = Drone.getAndActivateDrone();
 
 setTimeout(function() {
@@ -76,11 +78,9 @@ setTimeout(function() {
         log.fatal("No Drone-Connection");
     } else {
 
-
         r.MediaStreaming.videoEnable(1);
 
         Drone.useGUI(withgui);
-
 
         Controller.setDrone(r);
 

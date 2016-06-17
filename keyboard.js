@@ -100,3 +100,9 @@ Cylon.robot({
 
   }
 }).start();
+
+module.exports = {
+setDrone: function(value){
+  r = value;
+}
+};

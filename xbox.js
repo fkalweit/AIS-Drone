@@ -239,5 +239,8 @@ module.exports = {
 start_stream: function(value){
     log.info("start stream");
     mjpgSream = value;
-  }
+  },
+setDrone: function(value){
+  r = value;
+}
 };
