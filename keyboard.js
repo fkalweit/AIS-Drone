@@ -10,6 +10,7 @@ var Drone = require('./drone');
 
 var Gamepad = require("gamepad");
 
+var log = require('./logger').createLogger('Keyboard');
 
 //====================== CODE ======================
 
@@ -26,70 +27,70 @@ Cylon.robot({
   work: function(k) {
 
     k.keyboard.on('t', function(key) {
-      console.log("TAKEOFF");
+      log.info("TAKEOFF");
       r.takeOff();
       //after((5).seconds(), bebop.drone.land);
     });
 
     k.keyboard.on('space', function(key) {
-      console.log("EMERGENCY!");
+      log.info("EMERGENCY!");
       r.emergency();
     });
 
     k.keyboard.on('l', function(key) {
-      console.log("LAND!");
+      log.info("LAND!");
       r.land();
     });
 
     k.keyboard.on('e', function(key) {
-      console.log("UP");
+      log.info("UP");
       r.up(10);
     });
 
     k.keyboard.on('q', function(key) {
-      console.log("DOWN");
+      log.info("DOWN");
       r.down(10);
     });
 
     k.keyboard.on('w', function(key) {
-      console.log("FORWARD");
+      log.info("FORWARD");
       r.forward(20);
     });
 
     k.keyboard.on('s', function(key) {
-      console.log("BACKWARD");
+      log.info("BACKWARD");
       r.backward(20);
     });
 
     k.keyboard.on('a', function(key) {
-      console.log("LEFT!");
+      log.info("LEFT!");
       r.left(20);
     });
 
     k.keyboard.on('d', function(key) {
-      console.log("RIGHT!");
+      log.info("RIGHT!");
       r.right(20);
     });
 
     k.keyboard.on('keyup', function(key){
-      console.log("STOP -> HOVER");
+      log.info("STOP -> HOVER");
       r.stop();
     });
 
 	k.keyboard.on('o', function(key) {
-      console.log("SetHome");
+      log.info("SetHome");
       Drone.setCurrentPositionToHome();
     });
 
-  k.keyboard.on('1', function(key) {
-        console.log("gamepad");
+  k.keyboard.on('f', function(key) {
+        log.info("shutdown gamepad");
         Gamepad.shutdown();
         //TODO
     });
 
-  k.keyboard.on('2', function(key) {
-          console.log("balance board");
-          //TODO
+    k.keyboard.on('g', function(key) {
+          log.info("init gamepad");
+          Gamepad.detectDevices();
       });
   k.keyboard.on('left', function(key) {
               console.log("counterclockwise");
@@ -108,7 +109,7 @@ Cylon.robot({
 
 
 	// k.keyboard.on('p', function(key) {
-  //     console.log("DISCONNECT");
+  //     log.info("DISCONNECT");
   //     r.Network.disconnect()
   //   });
 
