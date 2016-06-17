@@ -122,18 +122,6 @@ drone.connect(function() {
     });
 });
 
-process.on('exit', (code) => {
-    drone.Network.disconnect()
-    console.log("Disconnected from the drone");
-    console.log('About to exit with code:', code);
-});
-
-process.on('SIGINT', function() {
-    console.log(" ");
-    console.log("Caught interrupt signal");
-    process.exit();
-});
-
 // function printGUI(){
 //
 //   if(usegui){

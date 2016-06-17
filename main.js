@@ -84,6 +84,7 @@ var myapp = spawn('java', ['-jar', 'WiiRemoteJ.jar']);
             log.debug('child process exited with code ' + code);
         });
 
+
 var r = Drone.getAndActivateDrone();
 
 process.on('exit', (code) => {
@@ -99,10 +100,7 @@ process.on('SIGINT', function() {
   console.log(" ");
   console.log("Caught interrupt signal");
   process.exit();
-});
-
-
-
+}); 
 
 setTimeout(function() {
     //DEFAULT: start xbox with ui without log + no stream
