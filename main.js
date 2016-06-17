@@ -11,9 +11,16 @@ var joystickActivated = false;
 var boardConnected = false;
 
 var Table = require('console.table');
+var os = require('os');
+var log = require('./logger').createLogger('Main', loglevel);
 
 process.argv.forEach(function(val, index, array) {
     //console.log(index + ': ' + val);   // Für Debug des switch
+    if (array.length == 2) {
+        return 0;
+    }
+    console.log("array " + array.length + " index: " + index + " val " + val);
+    console.log(val);
     switch (val) {
         case "-h":
         case "--help":
@@ -22,6 +29,10 @@ process.argv.forEach(function(val, index, array) {
             break;
         case "-s":
         case "--stream":
+            if (os.platform() == "win32" || os.platform() == "win64") {
+                log.error("Stream does not work on Windows!");
+                process.exit(0);
+            }
             stream = true;
             break;
         case "-v":
@@ -29,11 +40,20 @@ process.argv.forEach(function(val, index, array) {
             loglevel = 10;
             withgui = false;
             break;
+        case "-l":
+        case "--log":
+            loglevel = parseInt(array[index + 1]);
+            console.log(parseInt(array[index + 1]));
+            array.splice(index, 1);
+            break;
         case "--no-ui":
             withgui = false;
             break;
         default:
-            return 0;
+            if (index > 1) {
+                console.log("unknown arg");
+                process.exit(0);
+            }
     }
 });
 
@@ -43,9 +63,10 @@ process.argv.forEach(function(val, index, array) {
 // var logger = require('./logger').createLogger(< modul_name >, [<log_level>]);
 // if no log_level is passed, the previous set will be used.
 // Then u can do log.x for x € [trace, debug, info, warn, error, fatal]
-var log = require('./logger').createLogger('Main', loglevel);
 
 var Drone = require('./drone');
+
+var Keyboard = require('./keyboard');
 
 var r = Drone.getAndActivateDrone();
 
@@ -55,13 +76,17 @@ setTimeout(function() {
         log.fatal("No Drone-Connection");
     } else {
 
+
         r.MediaStreaming.videoEnable(1);
 
         Drone.useGUI(withgui);
 
-        var Controller = require('./xbox');
 
-        var Keyboard = require('./keyboard');
+        Controller.setDrone(r);
+
+        Drone.useGUI(withgui);
+
+        Keyboard.setDrone(r);
 
         if (stream) Controller.start_stream(true);
         //if(stream) var MJpegStream = require('./mjpeg');
@@ -147,9 +172,58 @@ function printHelp() {
         OPTION2: '--verbose',
         DESCRIPTION: 'Prints debug log on stdout and disables the GUI'
     }, {
+        OPTION: '-l <level>',
+        OPTION2: '--log <level>',
+        DESCRIPTION: 'Set loglevel to <loglevel>'
+    }, {
         OPTION2: '--no-ui',
         DESCRIPTION: "Disables the console user interface"
     }]);
+    console.log("Assignment of keyboard keys:\n");
+    console.table([{
+        Button: 't',
+        DESCRIPTION: 'takeoff'
+    }, {
+        Button: 'l',
+        DESCRIPTION: 'land'
+    }, {
+        Button: 'space',
+        DESCRIPTION: 'emergency'
+    }, {
+        Button: 'w',
+        DESCRIPTION: 'move forward'
+    }, {
+        Button: 's',
+        DESCRIPTION: 'move backward'
+    }, {
+        Button: 'a',
+        DESCRIPTION: 'move left'
+    }, {
+        Button: 'd',
+        DESCRIPTION: 'move right'
+    }, {
+        Button: 'e',
+        DESCRIPTION: 'rise'
+    }, {
+        Button: 'q',
+        DESCRIPTION: 'sink'
+    }, {
+        Button: '1',
+        DESCRIPTION: 'activate/deactivate gamepad'
+    }, {
+        Button: '2',
+        DESCRIPTION: 'activate/deactivate balance board'
+    }, {
+        Button: 'left',
+        DESCRIPTION: 'counterclockwise'
+    }, {
+        Button: 'right',
+        DESCRIPTION: 'clockwise'
+    }, {
+        Button: 'end',
+        DESCRIPTION: 'quit programm'
+    }]);
+    console.log("\n");
 
     console.log("Assignment of controller keys:\n");
     console.table([{
@@ -194,26 +268,28 @@ function printHelp() {
     }]);
     console.log("\n");
 
-    // Export-Methoden des Moduls.
-    // Ermöglicht Aufruf der Funktionen in anderen Modulen.
-    module.exports = {
-        getControllerActivated: function() {
-            return controllerActivated;
-        },
-        setControllerActivated: function(val) {
-            controllerActivated = val;
-        },
-        getBalanceBoardActivated: function() {
-            return balanceBoardActivated;
-        },
-        setBalanceBoardActivated: function(val) {
-            balanceBoardActivated = val;
-        },
-        getJoystickActivated: function() {
-            return joystickActivated;
-        },
-        setJoystickActivated: function(val) {
-            joystickActivated = val;
-        }
-    }
 };
+
+
+// Export-Methoden des Moduls.
+// Ermöglicht Aufruf der Funktionen in anderen Modulen.
+module.exports = {
+    getControllerActivated: function() {
+        return controllerActivated;
+    },
+    setControllerActivated: function(val) {
+        controllerActivated = val;
+    },
+    getBalanceBoardActivated: function() {
+        return balanceBoardActivated;
+    },
+    setBalanceBoardActivated: function(val) {
+        balanceBoardActivated = val;
+    },
+    getJoystickActivated: function() {
+        return joystickActivated;
+    },
+    setJoystickActivated: function(val) {
+        joystickActivated = val;
+    }
+}
