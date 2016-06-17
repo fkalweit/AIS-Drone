@@ -34,19 +34,6 @@ var h_altitude = 0.0;
 var h_longitude = 0.0;
 var h_latitude = 0.0;
 
-
-setTimeout(function () {
-  console.log('\033[2J');
-   setInterval(function() {
-      if(usegui){
-        process.stdout.cursorTo(0,-1);  // move cursor to beginning of line
-        process.stdout.clearLine();  // clear current text
-        printGUI();
-      }
-    }, 200);
-},3000)
-
-
 drone.connect(function() {
     connected = true;
     drone.MediaStreaming.videoEnable(1);
@@ -136,100 +123,152 @@ drone.connect(function() {
 });
 
 process.on('exit', (code) => {
-  drone.Network.disconnect()
-  console.log("Disconnected from the drone");
-  console.log('About to exit with code:', code);
+    drone.Network.disconnect()
+    console.log("Disconnected from the drone");
+    console.log('About to exit with code:', code);
 });
 
 process.on('SIGINT', function() {
-  console.log(" ");
-  console.log("Caught interrupt signal");
-  process.exit();
+    console.log(" ");
+    console.log("Caught interrupt signal");
+    process.exit();
 });
 
-function printGUI(){
-
-  if(usegui){
-
-    console.table([
-    {
-      State: 'Is Connected: ',
-      CurrentValue: String(connected)
-    }, {
-      State: 'Balance Board Connected: ',
-      CurrentValue: boardConnected
-    }, {
-      State: 'Balance Board Activated: ',
-      CurrentValue: boardActivated
-    }, {
-      State: 'Drohnestatus: ',
-      CurrentValue: state
-    }, {
-      State: 'Battery: ',
-      CurrentValue: battery
-    }, {
-      State: 'Satellites: ',
-      CurrentValue: satellites
-    }, {
-      State: 'GPS: ',
-      H: altitude,
-      L: longitude,
-      B: latitude
-    }, {
-      State: 'Home Position:',
-      H: h_altitude,
-      L: h_longitude,
-      B: h_latitude
-    }, {
-      State: 'DistanceFromHome: ',
-      CurrentValue: currentDistanceFromHome
-    }, {
-      State: 'OutOfArea: ',
-      CurrentValue: isOutOfArea
-    }, {
-      State: 'OutOfAreaContextState: ',
-      CurrentValue: OutOfAreaContextState
-    }
-  ]);
-
-    console.log("\r\n");
-    console.log("\r\n");
-  }
-};
+// function printGUI(){
+//
+//   if(usegui){
+//
+//     console.table([
+//     {
+//       State: 'Is Connected: ',
+//       CurrentValue: String(connected)
+//     }, {
+//       State: 'Balance Board Connected: ',
+//       CurrentValue: boardConnected
+//     }, {
+//       State: 'Balance Board Activated: ',
+//       CurrentValue: boardActivated
+//     }, {
+//       State: 'Drohnestatus: ',
+//       CurrentValue: state
+//     }, {
+//       State: 'Battery: ',
+//       CurrentValue: battery
+//     }, {
+//       State: 'Satellites: ',
+//       CurrentValue: satellites
+//     }, {
+//       State: 'GPS: ',
+//       H: altitude,
+//       L: longitude,
+//       B: latitude
+//     }, {
+//       State: 'Home Position:',
+//       H: h_altitude,
+//       L: h_longitude,
+//       B: h_latitude
+//     }, {
+//       State: 'DistanceFromHome: ',
+//       CurrentValue: currentDistanceFromHome
+//     }, {
+//       State: 'OutOfArea: ',
+//       CurrentValue: isOutOfArea
+//     }, {
+//       State: 'OutOfAreaContextState: ',
+//       CurrentValue: OutOfAreaContextState
+//     }
+//   ]);
+//
+//     console.log("\r\n");
+//     console.log("\r\n");
+//   }
+// };
 
 // Export-Methoden des Moduls.
 // Ermöglicht Aufruf der Drohne und anderer Funktionen in anderen Modulen.
 module.exports = {
-  getAndActivateDrone: function () {
-    return drone;
-  },
+    getAndActivateDrone: function() {
+        return drone;
+    },
 
-  isConnected: function (){
-    return connected;
-  },
+    isConnected: function() {
+        return connected;
+    },
 
-  setCurrentPositionToHome: function(){
-    drone.GPSSettings.setHome(latitude, longitude, altitude);
-  },
+    setCurrentPositionToHome: function() {
+        drone.GPSSettings.setHome(latitude, longitude, altitude);
+    },
 
-  useGUI: function(value){
-      usegui = value;
-  },
+    useGUI: function(value) {
+        usegui = value;
+    },
 
-  videoEnable: function(){
-    drone.MediaStreaming.videoEnable(1);
-  },
+    videoEnable: function() {
+        drone.MediaStreaming.videoEnable(1);
+    },
 
-  getStream:  function(){
-    drone.MediaStreaming.videoEnable(1);
-    return drone.getMjpegStream();
-  },
+    getStream: function() {
+        drone.MediaStreaming.videoEnable(1);
+        return drone.getMjpegStream();
+    },
 
-  setBoardConnected: function(val){
-    boardConnected = val;
-  },
+    getAltitude: function() {
+        return altitude;
+    },
 
-  setBoardActivated: function(val){
-    boardActivated = val;
-  }
+    getLongitude: function() {
+        return longitude;
+    },
+
+    getLatitude: function() {
+        return latitude;
+    },
+
+    getHomeAltitude: function() {
+        return h_altitude;
+    },
+
+    getHomeLongitude: function() {
+        return h_longitude;
+    },
+
+    getHomeLatitude: function() {
+        return h_latitude;
+    },
+
+    getState: function() {
+        return state;
+    },
+
+    getSatellites: function() {
+        return getSatellites;
+    },
+
+    getBattery: function() {
+        return battery;
+    },
+
+    getAreaRadiusInMeter: function() {
+        return areaRadiusInMeter;
+    },
+
+    getOutOfArea: function() {
+      return isOutOfArea;
+    },
+
+    getCurrentDistanceFromHome: function() {
+      return currentDistanceFromHome;
+    },
+
+    getOutOfAreaContextState: function() {
+      return OutOfAreaContextState;
+    },
+
+    setBoardConnected: function(val) {
+        boardConnected = val;
+    },
+
+    setBoardActivated: function(val) {
+        boardActivated = val;
+    }
 };
