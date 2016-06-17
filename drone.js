@@ -122,56 +122,6 @@ drone.connect(function() {
     });
 });
 
-// function printGUI(){
-//
-//   if(usegui){
-//
-//     console.table([
-//     {
-//       State: 'Is Connected: ',
-//       CurrentValue: String(connected)
-//     }, {
-//       State: 'Balance Board Connected: ',
-//       CurrentValue: boardConnected
-//     }, {
-//       State: 'Balance Board Activated: ',
-//       CurrentValue: boardActivated
-//     }, {
-//       State: 'Drohnestatus: ',
-//       CurrentValue: state
-//     }, {
-//       State: 'Battery: ',
-//       CurrentValue: battery
-//     }, {
-//       State: 'Satellites: ',
-//       CurrentValue: satellites
-//     }, {
-//       State: 'GPS: ',
-//       H: altitude,
-//       L: longitude,
-//       B: latitude
-//     }, {
-//       State: 'Home Position:',
-//       H: h_altitude,
-//       L: h_longitude,
-//       B: h_latitude
-//     }, {
-//       State: 'DistanceFromHome: ',
-//       CurrentValue: currentDistanceFromHome
-//     }, {
-//       State: 'OutOfArea: ',
-//       CurrentValue: isOutOfArea
-//     }, {
-//       State: 'OutOfAreaContextState: ',
-//       CurrentValue: OutOfAreaContextState
-//     }
-//   ]);
-//
-//     console.log("\r\n");
-//     console.log("\r\n");
-//   }
-// };
-
 // Export-Methoden des Moduls.
 // Ermöglicht Aufruf der Drohne und anderer Funktionen in anderen Modulen.
 module.exports = {
