@@ -16,20 +16,7 @@ var Table = require('console.table');
 var os = require('os');
 var log = require('./logger').createLogger('Main', loglevel);
 
-process.on('exit', (code) => {
-  r.Network.disconnect();
-  myapp.kill('SIGKILL');
-  console.log("Disconnected from the drone");
-  console.log('About to exit with code:', code);
-});
 
-process.on('SIGINT', function() {
-  r.Network.disconnect();
-  myapp.kill('SIGKILL');
-  console.log(" ");
-  console.log("Caught interrupt signal");
-  process.exit();
-});
 
 process.argv.forEach(function(val, index, array) {
     //console.log(index + ': ' + val);   // Für Debug des switch
@@ -110,10 +97,41 @@ else {
 
 var r = Drone.getAndActivateDrone();
 
+process.on('exit', (code) => {
+  r.Network.disconnect();
+  myapp.kill('SIGKILL');
+  console.log("Disconnected from the drone");
+  console.log('About to exit with code:', code);
+});
+
+process.on('SIGINT', function() {
+  r.Network.disconnect();
+  myapp.kill('SIGKILL');
+  console.log(" ");
+  console.log("Caught interrupt signal");
+  process.exit();
+});
+
 setTimeout(function() {
-    //DEFAULT: start xbox with ui without log + no stream
-    if (!Drone.isConnected()) {
+      //DEFAULT: start xbox with ui without log + no stream
+      if (!Drone.isConnected()) {
         log.fatal("No Drone-Connection");
+        var CLI = require('clui'),
+          Spinner = CLI.Spinner;
+
+        var countdown = new Spinner('No Drone-Connection. Exiting in 10 seconds...  ');
+
+        countdown.start();
+
+        var number = 10;
+        setInterval(function() {
+          number--;
+          countdown.message('No Drone-Connection. Exiting in ' + number + ' seconds...  ');
+          if (number === 0) {
+            process.stdout.write('\n');
+            process.exit(0);
+          }
+        }, 1000);
     } else {
 
         r.MediaStreaming.videoEnable(1);
@@ -124,16 +142,17 @@ setTimeout(function() {
 
         if (stream) Controller.start_stream(true);
         //if(stream) var MJpegStream = require('./mjpeg');
-    }
-    console.log('\033[2J');
-    setInterval(function() {
-        if (withgui) {
-            process.stdout.cursorTo(0, -1); // move cursor to beginning of line
-            process.stdout.clearLine(); // clear current text
-            printGUI();
-        }
-    }, 200);
 
+        console.log('\033[2J');
+        setInterval(function() {
+            if (withgui) {
+                process.stdout.cursorTo(0, -1); // move cursor to beginning of line
+                process.stdout.clearLine(); // clear current text
+                printGUI();
+            }
+        }, 200);
+
+    }
 }, 1500);
 
 function printGUI() {
@@ -187,6 +206,7 @@ function printHelp() {
     //console.log('\033[2J'); //clear
     console.log("Call: main.js [OPTION]\n");
     console.log("Controle a connected Bebop2 with Xbox-Controller.");
+    console.log("https://github.com/fog1992/AIS-Drone.git");
     console.log("On default the console-ui is activated.\n");
     console.table([{
         OPTION: '-?',
