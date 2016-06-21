@@ -16,6 +16,11 @@ var net = require('net');
 var split = require('split');
 var mjpgStream = false;
 
+Gamepad.on("attach", function(id, num) {
+  log.info("Controller connected")
+  log.debug(Gamepad.numDevices());
+});
+
 // Initialize the library
 Gamepad.init();
 
@@ -23,7 +28,7 @@ Gamepad.init();
 for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
   log.debug(i, Gamepad.deviceAtIndex());
 }
-
+log.debug(Gamepad.numDevices());
 // Create a game loop and poll for events
 setInterval(Gamepad.processEvents, 16);
 // Scan for new Gamepads as a slower rate
@@ -126,10 +131,6 @@ Gamepad.on("down", function(id, num) {
             log.debug("aborted flying home...");
             r.Piloting.navigateHome(0);
             break;
-          case 8:
-            log.debug("EMERGENCY!");
-            r.emergency();
-            break;
           case 9:
             Board.enableBoard();
             log.debug("Balance Board Aktiviert");
@@ -183,17 +184,19 @@ Gamepad.on("up", function(id, num) {
 });
 
 Gamepad.on("remove", function(id, num) {
+  log.debug(Gamepad.numDevices());
   if (Main.controllerActivated) {
   if (!Drone.isConnected()) {
     log.fatal("No Drone-Connection");
   } else {
     try {
-      log.debug("Landing ... no Controller");
-      console.log("STOPPPPPPPPPPPPPP");
-      r.land();
+      log.debug("Hovering ... no Controller");
+      //console.log("STOPPPPPPPPPPPPPP");
+      //r.land();
+      r.stop();
     } catch (e) {
-      r.land();
-      log.debug("Landing because of Exception");
+      r.stop();
+      log.debug("hovering because of Exception");
     }
   }
 }

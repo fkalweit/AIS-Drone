@@ -1,10 +1,12 @@
 //Geofencing-Variablen - Start
 var distanceCalc = require('./GpsDistanceCalculator');
-var areaRadiusInMeter = 10.5;
+var areaRadiusInMeter = 2;
 var isOutOfArea = false;
 var currentDistanceFromHome = -1;
 var OutOfAreaContextState = "";
 //Geofencing-Variablen - Ende
+
+var Main = require('./main');
 
 var log = require('./logger').createLogger('Drone');
 
@@ -113,9 +115,11 @@ drone.connect(function() {
                 } else {
                     console.log("Drone leaves Area")
                     OutOfAreaContextState = "hat_Bereich_verlassen";
+                    Main.controllerActivated = false;
                     drone.stop();
                 }
             }
+
 
         }
 
