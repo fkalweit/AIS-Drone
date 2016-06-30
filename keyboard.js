@@ -98,7 +98,7 @@ Cylon.robot({
   });
   k.keyboard.on('right', function(key) {
         log.info("clockwise");
-        r.Clockwise(50);
+        r.clockwise(50);
   });
   k.keyboard.on('end', function(key) {
         log.info("quit");
