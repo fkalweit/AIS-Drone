@@ -46,32 +46,31 @@ Cylon.robot({
 
     k.keyboard.on('e', function(key) {
       log.info("UP");
-      r.up(10);
+      r.up(30);
     });
 
     k.keyboard.on('q', function(key) {
       log.info("DOWN");
-      r.down(10);
     });
 
     k.keyboard.on('w', function(key) {
       log.info("FORWARD");
-      r.forward(20);
+      r.forward(50);
     });
 
     k.keyboard.on('s', function(key) {
       log.info("BACKWARD");
-      r.backward(20);
+      r.backward(50);
     });
 
     k.keyboard.on('a', function(key) {
       log.info("LEFT!");
-      r.left(20);
+      r.left(50);
     });
 
     k.keyboard.on('d', function(key) {
       log.info("RIGHT!");
-      r.right(20);
+      r.right(50);
     });
 
     k.keyboard.on('keyup', function(key){
@@ -94,20 +93,17 @@ Cylon.robot({
           //TODO
       });
   k.keyboard.on('left', function(key) {
-              console.log("counterclockwise");
-                r.counterClockwise(30);
+        log.info("counterclockwise");
+        r.counterClockwise(50);
   });
   k.keyboard.on('right', function(key) {
-              console.log("clockwise");
-              r.Clockwise(30);
+        log.info("clockwise");
+        r.Clockwise(50);
   });
   k.keyboard.on('end', function(key) {
-              console.log("quit");
-              process.exit(0);
+        log.info("quit");
+        process.exit(0);
   });
-
-
-
 
 	// k.keyboard.on('p', function(key) {
   //     log.info("DISCONNECT");
