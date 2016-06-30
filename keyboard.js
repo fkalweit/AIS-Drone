@@ -90,6 +90,24 @@ Cylon.robot({
         //TODO
     });
 
+    k.keyboard.on('4', function(key) {
+        Main.startTakeTime(0);
+      });
+      k.keyboard.on('5', function(key) {
+          Main.startTakeTime(1);
+        });
+        k.keyboard.on('6', function(key) {
+            Main.startTakeTime(2);
+          });
+
+      k.keyboard.on('7', function(key) {
+          Main.stopTakeTime(0);
+        });
+
+        k.keyboard.on('8', function(key) {
+            Main.saveTime(0);
+          });
+
     k.keyboard.on('0', function(key) {
           //TODO
       });

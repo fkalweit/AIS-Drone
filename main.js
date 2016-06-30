@@ -8,7 +8,7 @@ var controllerActivated = false;
 var balanceBoardActivated = false;
 var joystickActivated = false;
 
-var raceModeAvtive = false;
+var raceModeActive = false;
 
 var boardConnected = false;
 
@@ -16,6 +16,61 @@ var Table = require('console.table');
 var os = require('os');
 var log = require('./logger').createLogger('Main', loglevel);
 
+
+module.exports = {
+
+  // evtl. Variablen direkt im Export
+
+
+    getControllerActivated: function() {
+        return controllerActivated;
+    },
+    setControllerActivated: function(val) {
+        controllerActivated = val;
+    },
+    getBalanceBoardActivated: function() {
+        return balanceBoardActivated;
+    },
+    setBalanceBoardActivated: function(val) {
+        balanceBoardActivated = val;
+    },
+    getJoystickActivated: function() {
+        return joystickActivated;
+    },
+    setJoystickActivated: function(val) {
+        joystickActivated = val;
+    },
+    startRace: function(){
+        raceModeActive = 1;
+    },
+    stopRace: function(){
+        raceModeActive = 0;
+    },
+    getRaceStatus: function(){
+        return raceModeActive;
+    },
+    startTakeTime: function(device){
+      currentDevice = device;
+      startTimeMeasure();
+    },
+    stopTakeTime: function(){
+      times[currentDevice] = stopTimeMeasure();
+      timestamp = null;
+    },
+    saveTime: function(){
+      if(!(times[0] == null && times[1] == null && times[2] == null)){
+        times[3] = (3 * times[0] + 2 * times[1] + 1 * times[2]);
+        scores.push(times);
+        times = [null, null, null, null];
+      }
+    },
+    getTimes: function(){
+      return times;
+    },
+    getScores: function(){
+      return scores;
+    }
+}
 
 
 process.argv.forEach(function(val, index, array) {
@@ -195,6 +250,24 @@ function printGUI() {
             CurrentValue: Drone.getOutOfAreaContextState()
         }]);
 
+
+        console.table([{ CurrentMeasure: measureOrZero()}]);
+
+        console.table([{
+          CurrentRun: "",
+          Xbox: times[0],
+          Joystick: times[1],
+          BalanceBoard: times[2]
+        }]);
+
+        scoreboard = [{SCORES: "", Xbox: "", Joystick: "", BalanceBoard: "" }];
+
+        scores.forEach(function(item){
+          scoreboard.push({SCORES: item[3], Xbox: item[0], Joystick: item[1], BalanceBoard: item[2] });
+        });
+
+        console.table(scoreboard);
+
         console.log("\r\n");
         console.log("\r\n");
 
@@ -319,31 +392,32 @@ function printHelp() {
 
 };
 
+function startRace(){
+  raceModeActive = 1;
+}
+
+var timestamp;
+
+function startTimeMeasure(){
+  timestamp = Date.now();
+}
+
+function stopTimeMeasure(){
+  return (Date.now() - timestamp) / 1000;
+}
+
+function measureOrZero(){
+  if (timestamp == null){
+    return 0;
+  }else{
+    return (Date.now() - timestamp) / 1000;
+  }
+}
+
+var times = [null, null, null, null];
+var scores = [];
+
 module.exports.controllerActivated = controllerActivated;
 
 // Export-Methoden des Moduls.
 // Ermöglicht Aufruf der Funktionen in anderen Modulen.
-module.exports = {
-
-  // evtl. Variablen direkt im Export
-
-
-    getControllerActivated: function() {
-        return controllerActivated;
-    },
-    setControllerActivated: function(val) {
-        controllerActivated = val;
-    },
-    getBalanceBoardActivated: function() {
-        return balanceBoardActivated;
-    },
-    setBalanceBoardActivated: function(val) {
-        balanceBoardActivated = val;
-    },
-    getJoystickActivated: function() {
-        return joystickActivated;
-    },
-    setJoystickActivated: function(val) {
-        joystickActivated = val;
-    }
-}
