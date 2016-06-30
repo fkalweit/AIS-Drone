@@ -5,7 +5,7 @@ var Board = require('./balanceboard');
 var Main = require('./main');
 
 
-console.log(Main.controllerActivated);
+log.debug(Main.controllerActivated);
 //var r = Drone.getAndActivateDrone();
 
 //Drone.useGUI(true);
@@ -116,12 +116,12 @@ Gamepad.on("down", function(id, num) {
             r.land();
             break;
           case 4:
-            log.debug("counterclockwise -> 30");
-            r.counterClockwise(30);
+            log.debug("counterclockwise -> 50");
+            r.counterClockwise(50);
             break;
           case 5:
-            log.debug("clockwise -> 30");
-            r.clockwise(30);
+            log.debug("clockwise -> 50");
+            r.clockwise(50);
             break;
           case 6:
             log.debug("returning Home...home...sweet home");
@@ -145,12 +145,12 @@ Gamepad.on("down", function(id, num) {
             r.land();
         }
       } catch (e) {
-        r.land();
-        log.error("Landing because of Exception");
+        r.stop();
+        log.error("Stop because of Exception");
       }
     }
 
-    console.log("up", {
+    log.debug("up", {
       id: id,
       num: num,
     });
@@ -177,7 +177,7 @@ Gamepad.on("up", function(id, num) {
       }
     } catch (e) {
       r.land();
-      log.debug("Landing because of Exception");
+      log.debug("Hovering because of Exception");
     }
   }
 }
@@ -191,12 +191,10 @@ Gamepad.on("remove", function(id, num) {
   } else {
     try {
       log.debug("Hovering ... no Controller");
-      //console.log("STOPPPPPPPPPPPPPP");
-      //r.land();
       r.stop();
     } catch (e) {
       r.stop();
-      log.debug("hovering because of Exception");
+      log.debug("Hovering because of Exception");
     }
   }
 }
@@ -243,7 +241,7 @@ setTimeout(function() {
 // Listen for button down events on all Gamepads
 Gamepad.on("down", function(id, num) {
   if (Main.controllerActivated) {
-  console.log("down", {
+  log.debug("down", {
     id: id,
     num: num,
   });
