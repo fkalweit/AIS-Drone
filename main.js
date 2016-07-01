@@ -9,17 +9,10 @@ var balanceBoardActivated = false;
 var joystickActivated = false;
 
 var raceModeActive = false;
-var playernumber = 1;
-var currentDevice = "n";
-
-var boardConnected = false;
 
 var Table = require('console.table');
 var os = require('os');
 var log = require('./logger').createLogger('Main', loglevel);
-var clear = require('cli-clear');
-
-var geofencingradius = 10;
 
 
 module.exports = {
@@ -56,19 +49,18 @@ module.exports = {
     },
 
     setJoystickActivated: function(val) {
+      if(Joystick.isConnected()) {
         joystickActivated = val;
+      }  else {
+          log.info('Joystick is not connected!');
+          joystickActivated = false;
+      }
     },
     startRace: function(){
-        raceModeActive = true;
-        scores = [];
-        timestamp = 0;
-        times = [0,0,0,0,0];
-        playernumber = 1;
-        clear();
+        raceModeActive = 1;
     },
     stopRace: function(){
-        raceModeActive = false;
-        clear();
+        raceModeActive = 0;
     },
     getRaceStatus: function(){
         return raceModeActive;
@@ -79,16 +71,13 @@ module.exports = {
     },
     stopTakeTime: function(){
       times[currentDevice] = stopTimeMeasure();
-      timestamp = 0;
+      timestamp = null;
     },
     saveTime: function(){
-      if(!(times[0] == 0 && times[1] == 0 && times[2] == 0)){
+      if(!(times[0] == null && times[1] == null && times[2] == null)){
         times[3] = (3 * times[0] + 2 * times[1] + 1 * times[2]);
-        times[4] = playernumber;
-        playernumber = playernumber + 1;
         scores.push(times);
-        times = [0, 0, 0, 0, 0];
-        clear();
+        times = [null, null, null, null];
       }
     },
     getTimes: function(){
@@ -104,8 +93,6 @@ module.exports = {
         joystickActivated = false;
     }
 };
-
-
 
 process.argv.forEach(function(val, index, array) {
     //console.log(index + ': ' + val);   // Für Debug des switch
@@ -134,21 +121,15 @@ process.argv.forEach(function(val, index, array) {
         case "-l":
         case "--log":
             loglevel = parseInt(array[index + 1]);
-            var log = require('./logger').createLogger('Main', loglevel);
             array.splice(index, 1);
             break;
-        case "-m":
-        case "--modus":
+          case "-m":
+          case "--modus":
             raceModeAvtive = parseInt(array[index + 1]);
             array.splice(index, 1);
             break;
         case "--no-ui":
             withgui = false;
-            break;
-        case "-r":
-        case "--geofencingradius":
-            geofencingradius = parseInt(array[index + 1]);
-            array.splice(index, 1);
             break;
         default:
             if (index > 1) {
@@ -167,14 +148,10 @@ process.argv.forEach(function(val, index, array) {
 var Controller = require('./xbox')
 
 var Drone = require('./drone');
-Drone.setAreaRadiusInMeter(geofencingradius);
 
 var Keyboard = require('./keyboard');
 
-var Controller = require('./xbox');
 var BalanceBoard = require('./balanceboard')
-
-var Joystick = require('./attack');
 
 if (os.platform() == "win32" || os.platform() == "win64") {
   log.info("WiiRemote does not work with Windows.")
@@ -182,17 +159,17 @@ if (os.platform() == "win32" || os.platform() == "win64") {
 else {
   var spawn = require("child_process").spawn;
   var myapp = spawn('java', ['-jar', 'WiiRemoteJ.jar']);
-          myapp.stdout.on('data', function (data) {
-              log.debug(data.toString());
-          });
+        myapp.stdout.on('data', function (data) {
+            log.debug(data.toString());
+        });
 
-          myapp.stderr.on('data', function (data) {
-              log.debug(data.toString());
-          });
+        myapp.stderr.on('data', function (data) {
+            log.debug(data.toString());
+        });
 
-          myapp.on('exit', function (code) {
-              log.debug('child process exited with code ' + code);
-          });
+        myapp.on('exit', function (code) {
+            log.debug('child process exited with code ' + code);
+        });
 }
 
 
@@ -244,9 +221,7 @@ setTimeout(function() {
         if (stream) Controller.start_stream(true);
         //if(stream) var MJpegStream = require('./mjpeg');
 
-        if(withgui){
-          clear();
-        }
+        console.log('\033[2J');
         setInterval(function() {
             if (withgui) {
                 process.stdout.cursorTo(0, -1); // move cursor to beginning of line
@@ -259,30 +234,28 @@ setTimeout(function() {
 }, 1500);
 
 function printGUI() {
-        console.log("\r\n");
-        console.log("-------------------------STATUS-----------------------------");
-        console.log("\r\n");
         console.table([{
             State: 'Is Connected: ',
             CurrentValue: String(Drone.isConnected())
-        },
-          {
-              State: 'Racemode: ',
-              CurrentValue: String(raceModeActive)
-          },
-         {
+        }, {
+        	  State: 'Controller Connected: ',
+        	  CurrentValue: Controller.isConnected()
+    	  }, {
+        	  State: 'Controller Activated: ',
+        	  CurrentValue: controllerActivated
+    	  }, {
+            State: 'Joystick Connected: ',
+            CurrentValue: Joystick.isConnected()
+        }, {
+            State: 'Joystick Activated: ',
+            CurrentValue: joystickActivated
+    	  }, {
             State: 'Balance Board Connected: ',
             CurrentValue: BalanceBoard.isConnected()
         }, {
             State: 'Balance Board Activated: ',
             CurrentValue: balanceBoardActivated
-    	}, {
-        	State: 'Controller Connected: ',
-        	CurrentValue: Controller.isConnected()
-    	}, {
-        	State: 'Controller Activated: ',
-        	CurrentValue: controllerActivated
-    	}, {
+    	  }, {
             State: 'Drohnen Status: ',
             CurrentValue: Drone.getState()
         }, {
@@ -305,9 +278,6 @@ function printGUI() {
             State: 'DistanceFromHome: ',
             CurrentValue: Drone.getCurrentDistanceFromHome()
         }, {
-            State: 'AreaRadiusInMeter: ',
-            CurrentValue: Drone.getAreaRadiusInMeter()
-        }, {
             State: 'OutOfArea: ',
             CurrentValue: Drone.getOutOfArea()
         }, {
@@ -315,34 +285,25 @@ function printGUI() {
             CurrentValue: Drone.getOutOfAreaContextState()
         }]);
 
-        if(raceModeActive){
 
-        console.log("\r\n");
-        console.log("-------------------------RACEMODE-----------------------------");
-        console.log("\r\n");
-        console.log("Device: "+ currentDevice + " CurrentMeasure: " + measureOrZero().toFixed(2));
-        console.log("\r\n");
+        console.table([{ CurrentMeasure: measureOrZero()}]);
 
         console.table([{
-          CurRun: "",
-          Xbox: times[0].toFixed(2),
-          Joystick: times[1].toFixed(2),
-          BalanceBoard: times[2].toFixed(2)
+          CurrentRun: "",
+          Xbox: times[0],
+          Joystick: times[1],
+          BalanceBoard: times[2]
         }]);
 
-        scoreboard = [{Player: "", Score: "", Xbox: "", Joystick: "", BalanceBoard: "" }];
-
-        scores.sort(function(a,b){return (a[3] - b[3]);});
+        scoreboard = [{SCORES: "", Xbox: "", Joystick: "", BalanceBoard: "" }];
 
         scores.forEach(function(item){
-          scoreboard.push({Player: item[4], Score: item[3].toFixed(2), Xbox: item[0].toFixed(2), Joystick: item[1].toFixed(2), BalanceBoard: item[2].toFixed(2) });
+          scoreboard.push({SCORES: item[3], Xbox: item[0], Joystick: item[1], BalanceBoard: item[2] });
         });
 
         console.table(scoreboard);
-      }
 
         console.log("\r\n");
-        console.log("-------------------------LOG (" + loglevel + ")-----------------------------");
         console.log("\r\n");
 
 };
@@ -408,6 +369,9 @@ function printHelp() {
         DESCRIPTION: 'activate/deactivate gamepad'
     }, {
         Button: '2',
+        DESCRIPTION: 'activate/deactivate joystick'
+    }, {
+        Button: '3',
         DESCRIPTION: 'activate/deactivate balance board'
     }, {
         Button: 'left',
@@ -467,7 +431,7 @@ function printHelp() {
 };
 
 function startRace(){
-  raceModeActive = true;
+  raceModeActive = 1;
 }
 
 var timestamp;
@@ -481,14 +445,14 @@ function stopTimeMeasure(){
 }
 
 function measureOrZero(){
-  if (timestamp == 0){
+  if (timestamp == null){
     return 0;
   }else{
     return (Date.now() - timestamp) / 1000;
   }
 }
 
-var times = [0, 0, 0, 0];
+var times = [null, null, null, null];
 var scores = [];
 
 //module.exports.controllerActivated = controllerActivated;

@@ -1,17 +1,8 @@
 var log = require('./logger').createLogger('Xbox');
 var Drone = require('./drone');
 var Gamepad = require("gamepad");
-var Board = require('./balanceboard');
 var Main = require('./main');
 
-//var r = Drone.getAndActivateDrone();
-
-//Drone.useGUI(true);
-//r.MediaStreaming.videoEnable(1);
-
-//var fs = require("fs");
-var net = require('net');
-var split = require('split');
 var mjpgStream = false;
 
 var connected = false;
@@ -30,8 +21,6 @@ module.exports = {
 }
 
 Gamepad.on("attach", function(id, state) {
-  //log.info("Controller connected")
-  //log.debug(Gamepad.numDevices());
   if(checkIfXbox(id)){
     connected = true;
   }
@@ -171,14 +160,8 @@ Gamepad.on("down", function(id, num) {
             r.Piloting.navigateHome(0);
             break;
           case 9:
-            Board.enableBoard();
-            log.debug("Balance Board Aktiviert");
             break;
           case 10:
-            log.debug("Balance Board Deaktiviert");
-            Board.disableBoard();
-            r.stop();
-            log.debug("Hovering...");
             break;
           default:
             r.land();
@@ -238,6 +221,14 @@ function checkIfXbox(id){
 
 
 Gamepad.on("remove", function(id, num) {
+
+  connected = false;
+  for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
+      if(Gamepad.deviceAtIndex(i)["vendorID"] == 1118){
+        connected = true;
+      }
+  }
+
   for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
     log.debug(i, Gamepad.deviceAtIndex(i));
   }

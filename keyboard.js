@@ -92,16 +92,22 @@ Cylon.robot({
             //TODO
         });
 
+
+
         k.keyboard.on('2', function(key) {
+          log.info("toggle joystick");
+
+          Main.setJoystickActivated(!Main.isJoystickActivated());
+        });
+
+		      k.keyboard.on('3', function(key) {
+
             log.info("toggle balanceboard");
 
             Main.setBalanceBoardActivated(!Main.isBalanceBoardActivated());
-            //TODO
-        });
 
-		k.keyboard.on('3', function(key) {
-            log.info("calibrate balanceboard");
-            BalanceBoard.calibrateBoard();
+            //log.info("calibrate balanceboard");
+            //BalanceBoard.calibrateBoard();
             //Main.setBalanceBoardActivated(!Main.isBalanceBoardActivated());
             //TODO
         });

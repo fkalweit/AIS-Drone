@@ -1,24 +1,11 @@
-/*
-WARNUNG !!!!!!!!
-NICHT MIT DEM XBOX-CONTROLLER AUSFÜHREN!!!
-DORT IST DIE LINKE SCHULTERTASTE EINE ACHSE...
-EINMAL DRAUFGEDRÜCKT UND DIE DROHNE STEIGT PERMAMENT... UNAUFHALTSAM...
-*/
-
-
-/* Ermöglicht Zugriff auf den Drohnenroboter.
-Dieser ist der Einfachheit halber immer mit 'r' benannt.
-Drohne ist also d.drone
-*/
 var Drone = require('./drone');
 var log = require('./logger').createLogger('Attack');
 var r = Drone.getAndActivateDrone();
-//r.MediaStreaming.videoEnable(1);
 
 var fs = require("fs");
 
 var Main = require('./main');
-var gamepad = require("gamepad");
+var Gamepad = require("Gamepad");
 
 var connected = false;
 
@@ -31,23 +18,24 @@ module.exports = {
   }
 }
 
+Gamepad.on("attach", function(id, state) {
+  if(checkIfAttack(id)){
+    connected = true;
+  }
+});
 
 // Initialize the library
-gamepad.init();
+Gamepad.init();
 
 // List the state of all currently attached devices
-for (var i = 0, l = gamepad.numDevices(); i < l; i++) {
-  log.debug(i, gamepad.deviceAtIndex(i));
+for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
+  log.debug(i, Gamepad.deviceAtIndex(i));
 }
 
 // Create a game loop and poll for events
-setInterval(gamepad.processEvents, 16);
-// Scan for new gamepads as a slower rate
-setInterval(gamepad.detectDevices, 500);
-
-//while(!Drone.isConnected()){
-
-//}
+setInterval(Gamepad.processEvents, 16);
+// Scan for new Gamepads as a slower rate
+setInterval(Gamepad.detectDevices, 500);
 
 
 if(!Drone.isConnected()){
@@ -57,138 +45,148 @@ if(!Drone.isConnected()){
 }
 
 
-// Listen for move events on all gamepads
-gamepad.on("move", function (id, axis, value) {
-  if(checkIfAttack(id)){
-  if(!Drone.isConnected()){
-    log.fatal("No Drone-Connection");
-  }else{
-    switch(axis){
-      case 0:
-      if(value > 0.01){
-        value = Math.round(value * 100);
-        log.debug("moving right by: " + value);
-        log.debug(value);
-      }else if(value < -0.01){
-        value = Math.round(value * -100);
-        log.debug("moving left by: " + value);
-        r.left(value);
-      }else{
-        //r.drone.hover();
-      }
-      break;
-      case 1:
-      if(value > 0.01){
-        value = Math.round(value * 100);
-        log.debug("moving backward by: " + value);
-        r.backward(value);
-      }else if(value < -0.01){
-        value = Math.round(value * -100);
-        log.debug("moving forward by: " + value);
-        r.forward(value);
-      }else{
-        //r.drone.stop();
-      }
-      break;
+// Listen for move events on all Gamepads
+Gamepad.on("move", function (id, axis, value) {
+  if(connected && checkIfAttack(id)){
+    if (Main.isJoystickActivated()) {
 
-      case 2:
-      if(value > 0.01){
-        value = Math.round(value * 100);
-        log.debug("sinking down by: " + value);
-        r.down(value);
-      }else if(value < -0.01){
-        value = Math.round(value * -100);
-        log.debug("lifting up by: " + value);
-        r.up(value);
-      }else{
-        //r.drone.stop();
+      if(!Drone.isConnected()){
+        log.fatal("No Drone-Connection");
+      } else {
+        switch(axis){
+          case 0:
+          if(value > 0.01){
+            value = Math.round(value * 100);
+            log.debug("moving right by: " + value);
+            log.debug(value);
+          }else if(value < -0.01){
+            value = Math.round(value * -100);
+            log.debug("moving left by: " + value);
+            r.left(value);
+          }else{
+            //r.drone.hover();
+          }
+          break;
+
+          case 1:
+          if(value > 0.01){
+            value = Math.round(value * 100);
+            log.debug("moving backward by: " + value);
+            r.backward(value);
+          }else if(value < -0.01){
+            value = Math.round(value * -100);
+            log.debug("moving forward by: " + value);
+            r.forward(value);
+          }else{
+            //r.drone.stop();
+          }
+          break;
+
+          case 2:
+          if(value > 0.01){
+            value = Math.round(value * 100);
+            log.debug("sinking down by: " + value);
+            r.down(value);
+          }else if(value < -0.01){
+            value = Math.round(value * -100);
+            log.debug("lifting up by: " + value);
+            r.up(value);
+          }else{
+            //r.drone.stop();
+          }
+          break;
+
+          default: {}
+        }
       }
-      break;
-      default: {}
     }
   }
-}
-
-  /*  console.log("move", {
-  id: id,
-  axis: axis,
-  value: value,
-}); */
 });
 
-// Listen for button up events on all gamepads
-gamepad.on("down", function (id, num) {
-  if(checkIfAttack(id)){
-  if(!Drone.isConnected()){
-    console.fatal("No Drone-Connection");
-  }else{
-    try{
-      switch(num) {
-        case 0:
-        log.debug("takeoff!");
-        r.takeOff();
-        if(Main.getRaceStatus()){
-          Main.startTakeTime(1);
+// Listen for button up events on all Gamepads
+Gamepad.on("down", function (id, num) {
+    if(connected && checkIfAttack(id)){
+      if(!Drone.isConnected()){
+        console.fatal("No Drone-Connection");
+      }else{
+        try{
+          switch(num) {
+            case 0:
+              log.debug("takeoff!");
+              r.takeOff();
+              if(Main.getRaceStatus()){
+                Main.startTakeTime(1);
+              }
+              break;
+
+            case 1:
+              log.debug("hovering...");
+              r.stop();
+              break;
+
+            case 2:
+              log.debug("landing...");
+              r.land();
+              if(Main.getRaceStatus()){
+                Main.stopTakeTime();
+              }
+              break;
+
+            case 3:
+              log.debug("clockwise -> 20");
+              r.clockwise(20);
+              break;
+
+            case 4:
+              log.debug("counterclockwise -> 20");
+              r.counterClockwise(20);
+              break;
+
+            case 5:
+              log.debug("taking picture");
+              r.takePicture();
+              break;
+
+            case 6:
+              log.debug("EMERGENCY!");
+              r.emergency();
+              break;
+
+            case 7:
+              log.debug("frontflip...");
+              r.frontFlip();
+              break;
+
+            case 8:
+              log.debug("backflip...");
+              r.backFlip();
+              break;
+
+            case 9:
+              log.debug("startRecording...");
+              r.startRecording();
+              break;
+
+            case 10:
+              log.debug("stopRecording...");
+              r.stopRecording();
+              break;
+
+            default:
+              r.emergency();
+          }
+        }catch (e){
+          r.land();
+          log.error("Landing because of Exception");
         }
-        break;
-        case 1:
-        log.debug("hovering...");
-        r.stop();
-        break;
-        case 2:
-        log.debug("landing...");
-        r.land();
-        if(Main.getRaceStatus()){
-          Main.stopTakeTime();
-        }
-        break;
-        case 3:
-        log.debug("clockwise -> 20");
-        r.clockwise(20);
-        break;
-        case 4:
-        log.debug("counterclockwise -> 20");
-        r.counterClockwise(20);
-        break;
-        case 5:
-        log.debug("taking picture");
-        r.takePicture();
-        break;
-        case 6:
-        log.debug("EMERGENCY!");
-        r.emergency();
-        break;
-        case 7:
-        log.debug("frontflip...");
-        r.frontFlip();
-        break;
-        case 8:
-        log.debug("backflip...");
-        r.backFlip();
-        break;
-        case 9:
-        log.debug("startRecording...");
-        r.startRecording();
-        break;
-        case 10:
-        log.debug("stopRecording...");
-        r.stopRecording();
-        break;
-        default:
-        r.emergency();
       }
-    }catch (e){
-      r.land();
-      log.error("Landing because of Exception");
     }
-  }
-}
 });
 
 function checkIfAttack(id){
-  for (var i = 0, l = gamepad.numDevices(); i < l; i++) {
-    if(gamepad.deviceAtIndex(i)["deviceID"] == id){
-      if(gamepad.deviceAtIndex(i)["vendorID"] == 1133 && gamepad.deviceAtIndex(i)["productID"] == 49684){
+  for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
+    if(Gamepad.deviceAtIndex(i)["deviceID"] == id){
+      if(Gamepad.deviceAtIndex(i)["vendorID"] == 1133 && Gamepad.deviceAtIndex(i)["productID"] == 49684){
         return true;
       }
     }
@@ -196,8 +194,40 @@ function checkIfAttack(id){
   return false;
 }
 
-// Listen for button down events on all gamepads
-gamepad.on("down", function (id, num) {
+Gamepad.on("remove", function(id, num) {
+
+  connected = false;
+  for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
+      if(Gamepad.deviceAtIndex(i)["vendorID"] == 1133 && Gamepad.deviceAtIndex(i)["productID"] == 49684){
+        connected = true;
+      }
+  }
+
+  for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
+    log.debug(i, Gamepad.deviceAtIndex(i));
+  }
+	  log.debug(Gamepad.numDevices());
+		if (!connected && Main.isJoystickActivated()) {
+			Main.setJoystickActivated(false);
+		  if (!Drone.isConnected()) {
+		    log.fatal("No Drone-Connection");
+		  } else {
+		    try {
+		      log.debug("Hovering ... no Controller");
+		      //console.log("STOPPPPPPPPPPPPPP");
+		      //r.land();
+		      r.stop();
+		    } catch (e) {
+		      r.stop();
+		      log.debug("hovering because of Exception");
+		    }
+		  }
+  }
+});
+
+
+// Listen for button down events on all Gamepads
+Gamepad.on("down", function (id, num) {
   if(checkIfAttack(id)){
   log.debug("down", {
     id: id,
