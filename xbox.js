@@ -32,7 +32,9 @@ module.exports = {
 Gamepad.on("attach", function(id, state) {
   //log.info("Controller connected")
   //log.debug(Gamepad.numDevices());
+  if(checkIfXbox(id)){
     connected = true;
+  }
 });
 
 // Initialize the library
@@ -40,7 +42,7 @@ Gamepad.init();
 
 // List the state of all currently attached devices
 for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
-  log.debug(i, Gamepad.deviceAtIndex());
+  log.debug(i, Gamepad.deviceAtIndex(i));
 }
 log.debug(Gamepad.numDevices());
 // Create a game loop and poll for events
@@ -59,7 +61,7 @@ var xAxisLastValue = 0.0;
 var yAxisLastValue = 0.0;
 // Listen for move events on all Gamepads
 Gamepad.on("move", function(id, axis, value) {
-  if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
+  if(connected && checkIfXbox(id)){
   if (Main.isControllerActivated()) {
   if (!Drone.isConnected()) {
     log.fatal("No Drone-Connection");
@@ -107,7 +109,7 @@ Gamepad.on("move", function(id, axis, value) {
     if(axis==0 || axis==1){
       if ( (Math.abs(xAxisLastValue) < deadZoneGamepad) && (Math.abs(yAxisLastValue) < deadZoneGamepad) ){
         log.debug("Automatic Hover !");
-        r.stop();
+        //r.stop();
       }
     }
 }
@@ -123,8 +125,8 @@ Gamepad.on("move", function(id, axis, value) {
 
 // Listen for button up events on all Gamepads
 Gamepad.on("down", function(id, num) {
-  if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
-  if (Main.controllerActivated) {
+  if(connected && checkIfXbox(id)){
+  if (Main.isControllerActivated()) {
     if (!Drone.isConnected()) {
       log.fatal("No Drone-Connection");
     } else {
@@ -196,7 +198,7 @@ Gamepad.on("down", function(id, num) {
 });
 
 Gamepad.on("up", function(id, num) {
-  if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
+  if(connected && checkIfXbox(id)){
 	  if (Main.isControllerActivated()) {
 		  if (!Drone.isConnected()) {
 		    log.fatal("No Drone-Connection");
@@ -223,11 +225,24 @@ Gamepad.on("up", function(id, num) {
   }
 });
 
+function checkIfXbox(id){
+  for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
+    if(Gamepad.deviceAtIndex(i)["deviceID"] == id){
+      if(Gamepad.deviceAtIndex(i)["vendorID"] == 1118){
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 
 Gamepad.on("remove", function(id, num) {
-  if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
+  for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
+    log.debug(i, Gamepad.deviceAtIndex(i));
+  }
 	  log.debug(Gamepad.numDevices());
-		connected = false;	  
+		connected = false;
 		if (Main.isControllerActivated()) {
 			Main.setControllerActivated(false);
 		  if (!Drone.isConnected()) {
@@ -243,7 +258,6 @@ Gamepad.on("remove", function(id, num) {
 		      log.debug("hovering because of Exception");
 		    }
 		  }
-	  }
   }
 });
 

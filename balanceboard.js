@@ -42,21 +42,21 @@ var server = net.createServer(function(connection) {
 
             if(massX > 0.1){
               massX = Math.round(massX * 100) * (100 / calibR);
-              log.info("moving right by: " + massX);
+              log.debug("moving right by: " + massX);
               r.right(massX);
             }else if(massX < -0.1){
               massX = Math.round(massX * -100) * (100 / -calibL);
-              log.info("moving left by: " + massX);
+              log.debug("moving left by: " + massX);
               r.left(massX);
             }
 
             if(massY > 0.1){
               massY = Math.round(massY * 100) * (100 / calibB);
-              log.info("moving backward by: " + massY);
+              log.debug("moving backward by: " + massY);
               r.backward(massY);
             }else if(massY < -0.1){
               massY = Math.round(massY * -100) * (100 / -calibF);
-              log.info("moving forward by: " + massY);
+              log.debug("moving forward by: " + massY);
               r.forward(massY);
             }
         }
@@ -87,20 +87,20 @@ function calibrate(data){
 
     if(massX > 0.1 && axe == 0){
       calibR = max(massX, calibR);
-      log.info("R-Max: " + calibR);
+      log.debug("R-Max: " + calibR);
     }else if(massX < -0.1 && axe == 1){
       calibL = min(massX, calibL);
-      log.info("L-Max: " + calibL);
+      log.debug("L-Max: " + calibL);
     }else{
       //r.drone.hover();
     }
 
     if(massY > 0.1 && axe == 2){
       calibB = max(massY, calibB);
-      log.info("B-Max: " + calibB);
+      log.debug("B-Max: " + calibB);
     }else if(massY < -0.1 && axe == 3){
       calibF = min(massY, calibF);
-      log.info("F-Max: " + calibF);
+      log.debug("F-Max: " + calibF);
     }else{
       //r.drone.stop();
     }

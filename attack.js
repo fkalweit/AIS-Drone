@@ -17,6 +17,7 @@ var r = Drone.getAndActivateDrone();
 
 var fs = require("fs");
 
+var Main = require('./main');
 var gamepad = require("gamepad");
 
 // Initialize the library
@@ -24,7 +25,7 @@ gamepad.init();
 
 // List the state of all currently attached devices
 for (var i = 0, l = gamepad.numDevices(); i < l; i++) {
-  log.debug(i, gamepad.deviceAtIndex());
+  log.debug(i, gamepad.deviceAtIndex(i));
 }
 
 // Create a game loop and poll for events
@@ -46,6 +47,7 @@ if(!Drone.isConnected()){
 
 // Listen for move events on all gamepads
 gamepad.on("move", function (id, axis, value) {
+  if(checkIfAttack(id)){
   if(!Drone.isConnected()){
     log.fatal("No Drone-Connection");
   }else{
@@ -93,6 +95,7 @@ gamepad.on("move", function (id, axis, value) {
       default: {}
     }
   }
+}
 
   /*  console.log("move", {
   id: id,
@@ -103,6 +106,7 @@ gamepad.on("move", function (id, axis, value) {
 
 // Listen for button up events on all gamepads
 gamepad.on("down", function (id, num) {
+  if(checkIfAttack(id)){
   if(!Drone.isConnected()){
     console.fatal("No Drone-Connection");
   }else{
@@ -111,6 +115,9 @@ gamepad.on("down", function (id, num) {
         case 0:
         log.debug("takeoff!");
         r.takeOff();
+        if(Main.getRaceStatus()){
+          Main.startTakeTime(1);
+        }
         break;
         case 1:
         log.debug("hovering...");
@@ -119,6 +126,9 @@ gamepad.on("down", function (id, num) {
         case 2:
         log.debug("landing...");
         r.land();
+        if(Main.getRaceStatus()){
+          Main.stopTakeTime();
+        }
         break;
         case 3:
         log.debug("clockwise -> 20");
@@ -160,17 +170,26 @@ gamepad.on("down", function (id, num) {
       log.error("Landing because of Exception");
     }
   }
-
-  log.debug("up", {
-    id: id,
-    num: num,
-  });
+}
 });
+
+function checkIfAttack(id){
+  for (var i = 0, l = gamepad.numDevices(); i < l; i++) {
+    if(gamepad.deviceAtIndex(i)["deviceID"] == id){
+      if(gamepad.deviceAtIndex(i)["vendorID"] == 1133 && gamepad.deviceAtIndex(i)["productID"] == 49684){
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
 // Listen for button down events on all gamepads
 gamepad.on("down", function (id, num) {
-  log.info("down", {
+  if(checkIfAttack(id)){
+  log.debug("down", {
     id: id,
     num: num,
   });
+}
 });
