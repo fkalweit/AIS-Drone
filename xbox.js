@@ -46,6 +46,7 @@ var xAxisLastValue = 0.0;
 var yAxisLastValue = 0.0;
 // Listen for move events on all Gamepads
 Gamepad.on("move", function(id, axis, value) {
+  if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
   if (Main.controllerActivated) {
   if (!Drone.isConnected()) {
     log.fatal("No Drone-Connection");
@@ -96,7 +97,7 @@ Gamepad.on("move", function(id, axis, value) {
         r.stop();
       }
     }
-
+}
   }
 
   /*console.log("move", {
@@ -109,6 +110,7 @@ Gamepad.on("move", function(id, axis, value) {
 
 // Listen for button up events on all Gamepads
 Gamepad.on("down", function(id, num) {
+  if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
   if (Main.controllerActivated) {
     if (!Drone.isConnected()) {
       log.fatal("No Drone-Connection");
@@ -118,6 +120,9 @@ Gamepad.on("down", function(id, num) {
           case 0:
             log.debug("takeoff!");
             r.takeOff();
+            if(Main.getRaceStatus()){
+              Main.startTakeTime(0);
+            }
             break;
           case 1:
             log.debug("reset Home to current Position");
@@ -130,6 +135,9 @@ Gamepad.on("down", function(id, num) {
           case 3:
             log.debug("landing...");
             r.land();
+            if(Main.getRaceStatus()){
+            Main.stopTakeTime();
+          }
             break;
           case 4:
             log.debug("counterclockwise -> 30");
@@ -170,10 +178,12 @@ Gamepad.on("down", function(id, num) {
       id: id,
       num: num,
     });
-  }
+}
+}
 });
 
 Gamepad.on("up", function(id, num) {
+  if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
   if (Main.controllerActivated) {
   if (!Drone.isConnected()) {
     log.fatal("No Drone-Connection");
@@ -197,9 +207,11 @@ Gamepad.on("up", function(id, num) {
     }
   }
 }
+}
 });
 
 Gamepad.on("remove", function(id, num) {
+  if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
   log.debug(Gamepad.numDevices());
   if (Main.controllerActivated) {
   if (!Drone.isConnected()) {
@@ -215,6 +227,7 @@ Gamepad.on("remove", function(id, num) {
       log.debug("hovering because of Exception");
     }
   }
+}
 }
 });
 

@@ -9,12 +9,15 @@ var balanceBoardActivated = false;
 var joystickActivated = false;
 
 var raceModeActive = false;
+var playernumber = 1;
+var currentDevice = "n";
 
 var boardConnected = false;
 
 var Table = require('console.table');
 var os = require('os');
 var log = require('./logger').createLogger('Main', loglevel);
+var clear = require('cli-clear');
 
 var geofencingradius = 10;
 
@@ -43,10 +46,16 @@ module.exports = {
         joystickActivated = val;
     },
     startRace: function(){
-        raceModeActive = 1;
+        raceModeActive = true;
+        scores = [];
+        timestamp = 0;
+        times = [0,0,0,0,0];
+        playernumber = 1;
+        clear();
     },
     stopRace: function(){
-        raceModeActive = 0;
+        raceModeActive = false;
+        clear();
     },
     getRaceStatus: function(){
         return raceModeActive;
@@ -57,13 +66,16 @@ module.exports = {
     },
     stopTakeTime: function(){
       times[currentDevice] = stopTimeMeasure();
-      timestamp = null;
+      timestamp = 0;
     },
     saveTime: function(){
-      if(!(times[0] == null && times[1] == null && times[2] == null)){
+      if(!(times[0] == 0 && times[1] == 0 && times[2] == 0)){
         times[3] = (3 * times[0] + 2 * times[1] + 1 * times[2]);
+        times[4] = playernumber;
+        playernumber = playernumber + 1;
         scores.push(times);
-        times = [null, null, null, null];
+        times = [0, 0, 0, 0, 0];
+        clear();
       }
     },
     getTimes: function(){
@@ -102,6 +114,7 @@ process.argv.forEach(function(val, index, array) {
         case "-l":
         case "--log":
             loglevel = parseInt(array[index + 1]);
+            var log = require('./logger').createLogger('Main', loglevel);
             array.splice(index, 1);
             break;
         case "-m":
@@ -136,7 +149,9 @@ Drone.setAreaRadiusInMeter(geofencingradius);
 
 var Keyboard = require('./keyboard');
 
-var Controller = require('./xbox')
+var Controller = require('./xbox');
+
+var Joystick = require('./attack');
 
 if (os.platform() == "win32" || os.platform() == "win64") {
   log.info("WiiRemote does not work with Windows.")
@@ -206,7 +221,9 @@ setTimeout(function() {
         if (stream) Controller.start_stream(true);
         //if(stream) var MJpegStream = require('./mjpeg');
 
-        console.log('\033[2J');
+        if(withgui){
+          clear();
+        }
         setInterval(function() {
             if (withgui) {
                 process.stdout.cursorTo(0, -1); // move cursor to beginning of line
@@ -219,10 +236,18 @@ setTimeout(function() {
 }, 1500);
 
 function printGUI() {
+        console.log("\r\n");
+        console.log("-------------------------STATUS-----------------------------");
+        console.log("\r\n");
         console.table([{
             State: 'Is Connected: ',
             CurrentValue: String(Drone.isConnected())
-        }, {
+        },
+          {
+              State: 'Racemode: ',
+              CurrentValue: String(raceModeActive)
+          },
+         {
             State: 'Balance Board Connected: ',
             CurrentValue: boardConnected
         }, {
@@ -251,7 +276,7 @@ function printGUI() {
             State: 'DistanceFromHome: ',
             CurrentValue: Drone.getCurrentDistanceFromHome()
         }, {
-            State: 'areaRadiusInMeter: ',
+            State: 'AreaRadiusInMeter: ',
             CurrentValue: Drone.getAreaRadiusInMeter()
         }, {
             State: 'OutOfArea: ',
@@ -261,25 +286,34 @@ function printGUI() {
             CurrentValue: Drone.getOutOfAreaContextState()
         }]);
 
+        if(raceModeActive){
 
-        console.table([{ CurrentMeasure: measureOrZero()}]);
+        console.log("\r\n");
+        console.log("-------------------------RACEMODE-----------------------------");
+        console.log("\r\n");
+        console.log("Device: "+ currentDevice + " CurrentMeasure: " + measureOrZero().toFixed(2));
+        console.log("\r\n");
 
         console.table([{
-          CurrentRun: "",
-          Xbox: times[0],
-          Joystick: times[1],
-          BalanceBoard: times[2]
+          CurRun: "",
+          Xbox: times[0].toFixed(2),
+          Joystick: times[1].toFixed(2),
+          BalanceBoard: times[2].toFixed(2)
         }]);
 
-        scoreboard = [{SCORES: "", Xbox: "", Joystick: "", BalanceBoard: "" }];
+        scoreboard = [{Player: "", Score: "", Xbox: "", Joystick: "", BalanceBoard: "" }];
+
+        scores.sort(function(a,b){return (a[3] - b[3]);});
 
         scores.forEach(function(item){
-          scoreboard.push({SCORES: item[3], Xbox: item[0], Joystick: item[1], BalanceBoard: item[2] });
+          scoreboard.push({Player: item[4], Score: item[3].toFixed(2), Xbox: item[0].toFixed(2), Joystick: item[1].toFixed(2), BalanceBoard: item[2].toFixed(2) });
         });
 
         console.table(scoreboard);
+      }
 
         console.log("\r\n");
+        console.log("-------------------------LOG (" + loglevel + ")-----------------------------");
         console.log("\r\n");
 
 };
@@ -404,7 +438,7 @@ function printHelp() {
 };
 
 function startRace(){
-  raceModeActive = 1;
+  raceModeActive = true;
 }
 
 var timestamp;
@@ -418,14 +452,14 @@ function stopTimeMeasure(){
 }
 
 function measureOrZero(){
-  if (timestamp == null){
+  if (timestamp == 0){
     return 0;
   }else{
     return (Date.now() - timestamp) / 1000;
   }
 }
 
-var times = [null, null, null, null];
+var times = [0, 0, 0, 0];
 var scores = [];
 
 module.exports.controllerActivated = controllerActivated;

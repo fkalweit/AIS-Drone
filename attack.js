@@ -161,7 +161,7 @@ gamepad.on("down", function (id, num) {
     }
   }
 
-  console.log("up", {
+  log.debug("up", {
     id: id,
     num: num,
   });

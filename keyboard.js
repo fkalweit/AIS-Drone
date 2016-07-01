@@ -108,9 +108,15 @@ Cylon.robot({
             Main.saveTime(0);
           });
 
-    k.keyboard.on('0', function(key) {
-          //TODO
-      });
+          k.keyboard.on('0', function(key) {
+              if(Main.getRaceStatus() == true){
+                Main.stopRace();
+              }else {
+                Main.startRace();
+              }
+            });
+
+
   k.keyboard.on('left', function(key) {
               console.log("counterclockwise");
                 r.counterClockwise(30);
