@@ -2,6 +2,7 @@ var log = require('./logger').createLogger('Board');
 var net = require('net');
 var split = require('split');
 var Drone = require('./drone');
+var Main = require('./main')
 var r = Drone.getAndActivateDrone();
 
 var calibrated = false;
@@ -29,7 +30,7 @@ var server = net.createServer(function(connection) {
     boardConnected = true;
     Drone.setBoardConnected(true);
 
-    if(boardConnected && boardActivated){
+    if (boardConnected && Main.isBalanceBoardActivated()) {
       if(!Drone.isConnected()){
         log.fatal("No Drone-Connection");
       }else{
@@ -64,8 +65,8 @@ var server = net.createServer(function(connection) {
   });
 
   connection.on ('end', function(status){
-    balanceboardconnected = false;
-    Drone.setBoardConnected(false);
+    boardConnected = false;
+    //Drone.setBoardConnected(false);
     log.error('Balance Board Disconnected -> Hovering');
     r.stop();
   });
@@ -134,26 +135,13 @@ function min(a, b){
 }
 
 module.exports = {
-  enableBoard: function(){
-    if(boardConnected){
-      boardActivated = true;
-      Drone.setBoardConnected(true);
-      Drone.setBoardActivated(true);
-    }else{
-      log.error('Can not activate board, because it is not connected');
+
+    isConnected: function() {
+        return boardConnected;
+    },
+
+    calibrateBoard: function() {
+        calibrate();
     }
-  },
 
-  disableBoard: function(){
-    boardActivated = false;
-    Drone.setBoardActivated(false);
-  },
-
-  isEnabled: function(){
-    return boardActivated;
-  },
-
-  isConnected: function(){
-    return boardConnected;
-  }
 };

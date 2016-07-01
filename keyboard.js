@@ -10,6 +10,8 @@ var Drone = require('./drone');
 
 var Gamepad = require("gamepad");
 
+var BalanceBoard = require('./balanceboard')
+
 var Main = require('./main');
 
 var log = require('./logger').createLogger('Keyboard');
@@ -83,12 +85,27 @@ Cylon.robot({
       log.info("SetHome");
       Drone.setCurrentPositionToHome();
     });
+        k.keyboard.on('1', function(key) {
+            log.info("toggle gamepad");
 
-  k.keyboard.on('1', function(key) {
-        log.info("toggle gamepad");
-        Main.controllerActivated = !Main.controllerActivated;
-        //TODO
-    });
+            Main.setControllerActivated(!Main.isControllerActivated());
+            //TODO
+        });
+
+        k.keyboard.on('2', function(key) {
+            log.info("toggle balanceboard");
+
+            Main.setBalanceBoardActivated(!Main.isBalanceBoardActivated());
+            //TODO
+        });
+
+		k.keyboard.on('3', function(key) {
+            log.info("calibrate balanceboard");
+            BalanceBoard.calibrateBoard();
+            //Main.setBalanceBoardActivated(!Main.isBalanceBoardActivated());
+            //TODO
+        });
+
 
     k.keyboard.on('4', function(key) {
         Main.startTakeTime(0);

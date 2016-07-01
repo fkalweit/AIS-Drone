@@ -24,24 +24,37 @@ var geofencingradius = 10;
 
 module.exports = {
 
-  // evtl. Variablen direkt im Export
-
-
-    getControllerActivated: function() {
+    isControllerActivated: function() {
         return controllerActivated;
     },
+
     setControllerActivated: function(val) {
-        controllerActivated = val;
+        if (Controller.isConnected()) {
+            controllerActivated = val;
+        } else {
+            log.info('Controller is not connected!');
+            controllerActivated = false;
+        }
     },
-    getBalanceBoardActivated: function() {
+
+    isBalanceBoardActivated: function() {
         return balanceBoardActivated;
     },
+
     setBalanceBoardActivated: function(val) {
-        balanceBoardActivated = val;
+        if (BalanceBoard.isConnected()) {
+            balanceBoardActivated = val;
+        } else {
+            log.info('Balance Board is not connected!');
+            balanceBoardActivated = false;
+        }
+
     },
-    getJoystickActivated: function() {
+
+    isJoystickActivated: function() {
         return joystickActivated;
     },
+
     setJoystickActivated: function(val) {
         joystickActivated = val;
     },
@@ -83,8 +96,15 @@ module.exports = {
     },
     getScores: function(){
       return scores;
+    },
+
+    deactivateAll: function() {
+        balanceBoardActivated = false;
+        controllerActivated = false;
+        joystickActivated = false;
     }
-}
+};
+
 
 
 process.argv.forEach(function(val, index, array) {
@@ -144,12 +164,15 @@ process.argv.forEach(function(val, index, array) {
 // if no log_level is passed, the previous set will be used.
 // Then u can do log.x for x € [trace, debug, info, warn, error, fatal]
 
+var Controller = require('./xbox')
+
 var Drone = require('./drone');
 Drone.setAreaRadiusInMeter(geofencingradius);
 
 var Keyboard = require('./keyboard');
 
 var Controller = require('./xbox');
+var BalanceBoard = require('./balanceboard')
 
 var Joystick = require('./attack');
 
@@ -249,11 +272,17 @@ function printGUI() {
           },
          {
             State: 'Balance Board Connected: ',
-            CurrentValue: boardConnected
+            CurrentValue: BalanceBoard.isConnected()
         }, {
             State: 'Balance Board Activated: ',
             CurrentValue: balanceBoardActivated
-        }, {
+    	}, {
+        	State: 'Controller Connected: ',
+        	CurrentValue: Controller.isConnected()
+    	}, {
+        	State: 'Controller Activated: ',
+        	CurrentValue: controllerActivated
+    	}, {
             State: 'Drohnen Status: ',
             CurrentValue: Drone.getState()
         }, {
@@ -462,7 +491,7 @@ function measureOrZero(){
 var times = [0, 0, 0, 0];
 var scores = [];
 
-module.exports.controllerActivated = controllerActivated;
+//module.exports.controllerActivated = controllerActivated;
 
 // Export-Methoden des Moduls.
 // Ermöglicht Aufruf der Funktionen in anderen Modulen.

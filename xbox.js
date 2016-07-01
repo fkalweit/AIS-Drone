@@ -4,8 +4,6 @@ var Gamepad = require("gamepad");
 var Board = require('./balanceboard');
 var Main = require('./main');
 
-
-console.log(Main.controllerActivated);
 //var r = Drone.getAndActivateDrone();
 
 //Drone.useGUI(true);
@@ -16,9 +14,25 @@ var net = require('net');
 var split = require('split');
 var mjpgStream = false;
 
-Gamepad.on("attach", function(id, num) {
-  log.info("Controller connected")
-  log.debug(Gamepad.numDevices());
+var connected = false;
+
+module.exports = {
+  isConnected: function() {
+      return connected;
+  },
+  start_stream: function(value) {
+    log.info("start stream");
+    mjpgStream = value;
+  },
+  setDrone: function(value) {
+    r = value;
+  }
+}
+
+Gamepad.on("attach", function(id, state) {
+  //log.info("Controller connected")
+  //log.debug(Gamepad.numDevices());
+    connected = true;
 });
 
 // Initialize the library
@@ -34,7 +48,6 @@ setInterval(Gamepad.processEvents, 16);
 // Scan for new Gamepads as a slower rate
 setInterval(Gamepad.detectDevices, 500);
 
-
 if (!Drone.isConnected()) {
   log.fatal("No Drone-Connection");
 }
@@ -47,7 +60,7 @@ var yAxisLastValue = 0.0;
 // Listen for move events on all Gamepads
 Gamepad.on("move", function(id, axis, value) {
   if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
-  if (Main.controllerActivated) {
+  if (Main.isControllerActivated()) {
   if (!Drone.isConnected()) {
     log.fatal("No Drone-Connection");
   } else {
@@ -184,51 +197,54 @@ Gamepad.on("down", function(id, num) {
 
 Gamepad.on("up", function(id, num) {
   if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
-  if (Main.controllerActivated) {
-  if (!Drone.isConnected()) {
-    log.fatal("No Drone-Connection");
-  } else {
-    try {
-      switch (num) {
-        case 4:
-          log.debug("counterclockwise -> 0");
-          r.counterClockwise(0);
-          break;
-        case 5:
-          log.debug("clockwise -> 0");
-          r.clockwise(0);
-          break;
-        default:
-          //r.land();
-      }
-    } catch (e) {
-      r.land();
-      log.debug("Landing because of Exception");
-    }
+	  if (Main.isControllerActivated()) {
+		  if (!Drone.isConnected()) {
+		    log.fatal("No Drone-Connection");
+		  } else {
+		    try {
+		      switch (num) {
+		        case 4:
+		          log.debug("counterclockwise -> 0");
+		          r.counterClockwise(0);
+		          break;
+		        case 5:
+		          log.debug("clockwise -> 0");
+		          r.clockwise(0);
+		          break;
+		        default:
+		          //r.land();
+		      }
+		    } catch (e) {
+		      r.land();
+		      log.debug("Landing because of Exception");
+		    }
+		  }
+	  }
   }
-}
-}
 });
+
 
 Gamepad.on("remove", function(id, num) {
   if(Gamepad.deviceAtIndex(id)['vendorID'] == 1118 && Gamepad.deviceAtIndex(id)['productID'] == 654){
-  log.debug(Gamepad.numDevices());
-  if (Main.controllerActivated) {
-  if (!Drone.isConnected()) {
-    log.fatal("No Drone-Connection");
-  } else {
-    try {
-      log.debug("Hovering ... no Controller");
-      //console.log("STOPPPPPPPPPPPPPP");
-      //r.land();
-      r.stop();
-    } catch (e) {
-      r.stop();
-      log.debug("hovering because of Exception");
-    }
+	  log.debug(Gamepad.numDevices());
+		connected = false;	  
+		if (Main.isControllerActivated()) {
+			Main.setControllerActivated(false);
+		  if (!Drone.isConnected()) {
+		    log.fatal("No Drone-Connection");
+		  } else {
+		    try {
+		      log.debug("Hovering ... no Controller");
+		      //console.log("STOPPPPPPPPPPPPPP");
+		      //r.land();
+		      r.stop();
+		    } catch (e) {
+		      r.stop();
+		      log.debug("hovering because of Exception");
+		    }
+		  }
+	  }
   }
-}
-}
 });
 
 
@@ -271,20 +287,10 @@ setTimeout(function() {
 }, 1000);
 // Listen for button down events on all Gamepads
 Gamepad.on("down", function(id, num) {
-  if (Main.controllerActivated) {
-  console.log("down", {
-    id: id,
-    num: num,
-  });
-}
+    if (Main.isControllerActivated()) {
+        console.log("down", {
+            id: id,
+            num: num,
+        });
+    }
 });
-
-module.exports = {
-  start_stream: function(value) {
-    log.info("start stream");
-    mjpgStream = value;
-  },
-  setDrone: function(value) {
-    r = value;
-  }
-};
