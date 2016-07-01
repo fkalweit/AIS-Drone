@@ -350,11 +350,11 @@ function printGUI() {
         });
 
         console.table(scoreboard);
-
+}
         console.log("\r\n");
         console.log("-------------------------LOG (" + loglevel + ")-----------------------------");
         console.log("\r\n");
-      }
+
 
 };
 
