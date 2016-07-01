@@ -5,7 +5,7 @@ var r = Drone.getAndActivateDrone();
 var fs = require("fs");
 
 var Main = require('./main');
-var Gamepad = require("Gamepad");
+var Gamepad = require("gamepad");
 
 var connected = false;
 

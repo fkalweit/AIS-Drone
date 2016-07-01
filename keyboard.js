@@ -148,6 +148,12 @@ Cylon.robot({
               console.log("clockwise");
               r.Clockwise(30);
   });
+
+  k.keyboard.on('return', function(key) {
+              r.stop();
+              log.debug("Hover");
+              Main.deactivateAll();
+  });
   k.keyboard.on('end', function(key) {
               console.log("quit");
               process.exit(0);

@@ -233,8 +233,7 @@ Gamepad.on("remove", function(id, num) {
     log.debug(i, Gamepad.deviceAtIndex(i));
   }
 	  log.debug(Gamepad.numDevices());
-		connected = false;
-		if (Main.isControllerActivated()) {
+		if (!connected && Main.isControllerActivated()) {
 			Main.setControllerActivated(false);
 		  if (!Drone.isConnected()) {
 		    log.fatal("No Drone-Connection");
