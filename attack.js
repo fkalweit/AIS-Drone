@@ -20,6 +20,18 @@ var fs = require("fs");
 var Main = require('./main');
 var gamepad = require("gamepad");
 
+var connected = false;
+
+module.exports = {
+  isConnected: function() {
+      return connected;
+  },
+  setDrone: function(value) {
+    r = value;
+  }
+}
+
+
 // Initialize the library
 gamepad.init();
 

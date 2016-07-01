@@ -15,6 +15,8 @@ var calibL = 0.0;
 var boardActivated = false;
 var boardConnected = false;
 
+var calibDirectionStrings = ['RECHTS','LINKS','HINTEN','VORNE']
+
 if(!Drone.isConnected()){
   log.fatal("No Drone-Connection");
 }
@@ -108,7 +110,8 @@ function calibrate(data){
 
 function startCalibInterval(){
   axe++;
-  log.info("Achse: " + axe + " wird kalibriert");
+  //log.info("Achse: " + axe + " wird kalibriert");
+  log.info("Nach " + calibDirectionStrings[axe] + " lehnen!!!" );
   setTimeout(function () {
     if(axe < 3){
       startCalibInterval();
