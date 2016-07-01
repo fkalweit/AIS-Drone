@@ -39,6 +39,11 @@ if (!Drone.isConnected()) {
   log.fatal("No Drone-Connection");
 }
 
+
+
+const deadZoneGamepad = 0.15;
+var xAxisLastValue = 0.0;
+var yAxisLastValue = 0.0;
 // Listen for move events on all Gamepads
 Gamepad.on("move", function(id, axis, value) {
   if (Main.controllerActivated) {
@@ -47,22 +52,24 @@ Gamepad.on("move", function(id, axis, value) {
   } else {
     switch (axis) {
       case 0:
-        if (value > 0.15) {
+        xAxisLastValue = value;
+        if (value > deadZoneGamepad) {
           value = Math.round(value * 100);
           log.debug("moving right by: " + value);
           r.right(value);
-        } else if (value < -0.15) {
+        } else if (value < -deadZoneGamepad) {
           value = Math.round(value * -100);
           log.debug("moving left by: " + value);
           r.left(value);
         }
         break;
       case 1:
-        if (value > 0.15) {
+        yAxisLastValue = value;
+        if (value > deadZoneGamepad) {
           value = Math.round(value * 100);
           log.debug("moving backward by: " + value);
           r.backward(value);
-        } else if (value < -0.15) {
+        } else if (value < -deadZoneGamepad) {
           value = Math.round(value * -100);
           log.debug("moving forward by: " + value);
           r.forward(value);
@@ -80,7 +87,16 @@ Gamepad.on("move", function(id, axis, value) {
         break;
       default:
         {}
+    }//end switch
+
+    //Auto-Hover wenn keine Bewegung aktiv
+    if(axis==0 || axis==1){
+      if ( (Math.abs(xAxisLastValue) < deadZoneGamepad) && (Math.abs(yAxisLastValue) < deadZoneGamepad) ){
+        log.debug("Automatic Hover !");
+        r.stop();
+      }
     }
+
   }
 
   /*console.log("move", {
