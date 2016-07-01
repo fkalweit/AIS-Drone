@@ -212,5 +212,14 @@ module.exports = {
 
     setBoardActivated: function(val) {
         boardActivated = val;
-    }
+    },
+
+
+    setAreaRadiusInMeter: function(val) {
+        areaRadiusInMeter = val;
+    },
+
+    getAreaRadiusInMeter: function() {
+      return areaRadiusInMeter;
+    },
 };

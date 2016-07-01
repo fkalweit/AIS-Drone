@@ -16,6 +16,8 @@ var Table = require('console.table');
 var os = require('os');
 var log = require('./logger').createLogger('Main', loglevel);
 
+var geofencingradius = 10;
+
 
 module.exports = {
 
@@ -102,13 +104,18 @@ process.argv.forEach(function(val, index, array) {
             loglevel = parseInt(array[index + 1]);
             array.splice(index, 1);
             break;
-          case "-m":
-          case "--modus":
+        case "-m":
+        case "--modus":
             raceModeAvtive = parseInt(array[index + 1]);
             array.splice(index, 1);
             break;
         case "--no-ui":
             withgui = false;
+            break;
+        case "-r":
+        case "--geofencingradius":
+            geofencingradius = parseInt(array[index + 1]);
+            array.splice(index, 1);
             break;
         default:
             if (index > 1) {
@@ -125,6 +132,7 @@ process.argv.forEach(function(val, index, array) {
 // Then u can do log.x for x € [trace, debug, info, warn, error, fatal]
 
 var Drone = require('./drone');
+Drone.setAreaRadiusInMeter(geofencingradius);
 
 var Keyboard = require('./keyboard');
 
@@ -242,6 +250,9 @@ function printGUI() {
         }, {
             State: 'DistanceFromHome: ',
             CurrentValue: Drone.getCurrentDistanceFromHome()
+        }, {
+            State: 'areaRadiusInMeter: ',
+            CurrentValue: Drone.getAreaRadiusInMeter()
         }, {
             State: 'OutOfArea: ',
             CurrentValue: Drone.getOutOfArea()
