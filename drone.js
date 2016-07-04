@@ -36,6 +36,9 @@ var h_altitude = 0.0;
 var h_longitude = 0.0;
 var h_latitude = 0.0;
 
+// Media Related Settings
+var currently_recording = false;
+
 drone.connect(function() {
     connected = true;
     drone.MediaStreaming.videoEnable(1);
@@ -81,51 +84,33 @@ drone.connect(function() {
     });
 
     drone.on("PositionChanged", function(pos) {
-        //console.log(pos);
         altitude = pos.altitude;
         longitude = pos.longitude;
         latitude = pos.latitude;
 
+        if(Main.isCurrentlyRacing()) {
 
-        if (!((h_longitude == 0) && (h_latitude == 0))) {
+          if (!((h_longitude == 0) && (h_latitude == 0))) {
 
-            var lastDistanceFromHome = currentDistanceFromHome
-            currentDistanceFromHome = distanceCalc.getDistanceInMeter(h_latitude, h_longitude, latitude, longitude);
+              var lastDistanceFromHome = currentDistanceFromHome
+              currentDistanceFromHome = distanceCalc.getDistanceInMeter(h_latitude, h_longitude, latitude, longitude);
 
-            var wasOutOfArea = isOutOfArea;
-            isOutOfArea = (currentDistanceFromHome > areaRadiusInMeter);
+              var wasOutOfArea = isOutOfArea;
+              isOutOfArea = (currentDistanceFromHome > areaRadiusInMeter);
 
-            OutOfAreaContextState = "unknown";
+              OutOfAreaContextState = "unknown";
 
-
-            if (isOutOfArea) {
-                if (wasOutOfArea) {
-                    if (Math.abs(lastDistanceFromHome - currentDistanceFromHome) > 1) { //erst nach einer Mindestbewegung prüfen in welche Richtung die Drohne fliegt
-                        if (currentDistanceFromHome > lastDistanceFromHome) { //Drohne entfernt sich weiter vom Home-Punkt
-                            console.log("Drone is out of Area")
-                            OutOfAreaContextState = "entfernt_sich_weiter";
-                            //drone.stop();
-                        } else {
-                            OutOfAreaContextState = "fliegt_richtung_home";
-                        }
-                    } else {
-                        //OutOfAreaContextState="geringe Bewegung";
-                    }
-
-                } else {
-                    console.log("Drone leaves Area")
-                    OutOfAreaContextState = "hat_Bereich_verlassen";
-                    Main.controllerActivated = false;
-                    drone.stop();
-                }
-            }
-
-
+              if (isOutOfArea) {
+                console.log("Drone leaves Area");
+                OutOfAreaContextState = "hat_Bereich_verlassen";
+                Main.deactivateAll();
+                Main.abortTakeTime();
+                drone.stop();
+              }
+          }
         }
-
     });
 });
-
 // Export-Methoden des Moduls.
 // Ermöglicht Aufruf der Drohne und anderer Funktionen in anderen Modulen.
 module.exports = {
@@ -152,6 +137,17 @@ module.exports = {
     getStream: function() {
         drone.MediaStreaming.videoEnable(1);
         return drone.getMjpegStream();
+    },
+
+    toggleVideoRecording: function() {
+        currently_recording = !currently_recording;
+        if(currently_recording) {
+          log.info("STOP RECORDING");
+          drone.stopRecording();
+        } else {
+          log.info("START RECORDING");
+          drone.startRecording();
+        }
     },
 
     getAltitude: function() {
@@ -221,5 +217,5 @@ module.exports = {
 
     getAreaRadiusInMeter: function() {
       return areaRadiusInMeter;
-    },
+    }
 };

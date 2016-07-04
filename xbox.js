@@ -151,8 +151,8 @@ Gamepad.on("down", function(id, num) {
             log.debug("landing...");
             r.land();
             if(Main.getRaceStatus()){
-            Main.stopTakeTime();
-          }
+              Main.stopTakeTime();
+            }
             break;
           case 4:
             log.debug("counterclockwise -> 50");

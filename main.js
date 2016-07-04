@@ -10,9 +10,12 @@ var joystickActivated = false;
 
 var geofencingradius = 10;
 
+//Race Mode
 var playernumber = 1;
 var currentDevice = "n";
+var deviceNames = ['Controller', 'Joystick','Balance Board'];
 var raceModeActive = false;
+var currently_racing = false;
 
 var Table = require('console.table');
 var os = require('os');
@@ -28,38 +31,48 @@ module.exports = {
 
     setControllerActivated: function(val) {
         if (Controller.isConnected()) {
+            deactivateAllControllers();
             controllerActivated = val;
+            if(val===true) {
+              currentDevice = 0
+            };
         } else {
             log.info('Controller is not connected!');
             controllerActivated = false;
         }
     },
-
-    isBalanceBoardActivated: function() {
-        return balanceBoardActivated;
-    },
-
-    setBalanceBoardActivated: function(val) {
-        if (BalanceBoard.isConnected()) {
-            balanceBoardActivated = val;
-        } else {
-            log.info('Balance Board is not connected!');
-            balanceBoardActivated = false;
-        }
-
-    },
-
     isJoystickActivated: function() {
         return joystickActivated;
     },
 
     setJoystickActivated: function(val) {
       if(Joystick.isConnected()) {
+        deactivateAllControllers();
         joystickActivated = val;
+        if(val===true) {
+          currentDevice = 1
+        };
       }  else {
           log.info('Joystick is not connected!');
           joystickActivated = false;
       }
+    },
+    isBalanceBoardActivated: function() {
+        return balanceBoardActivated;
+    },
+
+    setBalanceBoardActivated: function(val) {
+        if (BalanceBoard.isConnected()) {
+            deactivateAllControllers();
+            balanceBoardActivated = val;
+            if(val===true) {
+              currentDevice = 2
+            };
+        } else {
+            log.info('Balance Board is not connected!');
+            balanceBoardActivated = false;
+        }
+
     },
     startRace: function(){
       raceModeActive = true;
@@ -77,22 +90,34 @@ module.exports = {
         return raceModeActive;
     },
     startTakeTime: function(device){
-      currentDevice = device;
-      startTimeMeasure();
+      if(raceModeActive) {
+        currentDevice = device;
+        startTimeMeasure();
+      } else {
+        log.info('Could not start race. Race Mode is not activated')
+      }
     },
     stopTakeTime: function(){
       times[currentDevice] = stopTimeMeasure();
       timestamp = 0;
     },
+    abortTakeTime: function(){
+      times[currentDevice] = '-1';
+      timestamp = 0;
+    },
     saveTime: function(){
-      if(!(times[0] == 0 && times[1] == 0 && times[2] == 0)){
-                          times[3] = (3 * times[0] + 2 * times[1] + 1 * times[2]);
-              times[4] = playernumber;
-              playernumber = playernumber + 1;
-              scores.push(times);
-              times = [0, 0, 0, 0, 0];
-              clear();
-          }
+      if(raceModeActive) {
+        if(!(times[0] == 0 && times[1] == 0 && times[2] == 0)){
+                            times[3] = (3 * times[0] + 2 * times[1] + 1 * times[2]);
+                times[4] = playernumber;
+                playernumber = playernumber + 1;
+                scores.push(times);
+                times = [0, 0, 0, 0, 0];
+                clear();
+            }
+        } else {
+          log.info('Could not save time. Race Mode is not activated')
+        }
     },
     getTimes: function(){
       return times;
@@ -100,13 +125,19 @@ module.exports = {
     getScores: function(){
       return scores;
     },
-
     deactivateAll: function() {
-        balanceBoardActivated = false;
-        controllerActivated = false;
-        joystickActivated = false;
+        deactivateAllControllers();
+    },
+    isCurrentlyRacing: function() {
+      return currently_racing;
     }
 };
+
+function deactivateAllControllers(){
+  balanceBoardActivated = false;
+  controllerActivated = false;
+  joystickActivated = false;
+}
 
 process.argv.forEach(function(val, index, array) {
     //console.log(index + ': ' + val);   // Für Debug des switch
@@ -314,7 +345,7 @@ function printGUI() {
             State: 'DistanceFromHome: ',
             CurrentValue: Drone.getCurrentDistanceFromHome()
         },
-{
+        {
             State: 'AreaRadiusInMeter: ',
             CurrentValue: Drone.getAreaRadiusInMeter()
         },
@@ -328,29 +359,31 @@ function printGUI() {
 
         if(raceModeActive){
 
-        console.log("\r\n");
-        console.log("-------------------------RACEMODE-----------------------------");
-        console.log("\r\n");
-        console.log("Device: "+ currentDevice + " CurrentMeasure: " + measureOrZero().toFixed(2));
-        console.log("\r\n");
+          console.log("\r\n");
+          console.log("-------------------------RACEMODE-----------------------------");
+          console.log("\r\n");
 
-        console.table([{
-          CurRun: "",
-          Xbox: times[0].toFixed(2),
-          Joystick: times[1].toFixed(2),
-          BalanceBoard: times[2].toFixed(2)
-        }]);
+          console.log("")
+          console.log("Active Device: "+ deviceNames[currentDevice] + "  Time: " + measureOrZero().toFixed(2));
+          console.log("\r\n");
 
-        scoreboard = [{Player: "", Score: "", Xbox: "", Joystick: "", BalanceBoard: "" }];
+          console.table([{
+            CurRun: "",
+            Xbox: times[0].toFixed(2),
+            Joystick: times[1].toFixed(2),
+            BalanceBoard: times[2].toFixed(2)
+          }]);
 
-        scores.sort(function(a,b){return (a[3] - b[3]);});
+          scoreboard = [{Player: "", Score: "", Xbox: "", Joystick: "", BalanceBoard: "" }];
 
-        scores.forEach(function(item){
-           scoreboard.push({Player: item[4], Score: item[3].toFixed(2), Xbox: item[0].toFixed(2), Joystick: item[1].toFixed(2), BalanceBoard: item[2].toFixed(2) });
-        });
+          scores.sort(function(a,b){return (a[3] - b[3]);});
 
-        console.table(scoreboard);
-}
+          scores.forEach(function(item){
+             scoreboard.push({Player: item[4], Score: item[3].toFixed(2), Xbox: item[0].toFixed(2), Joystick: item[1].toFixed(2), BalanceBoard: item[2].toFixed(2) });
+          });
+
+          console.table(scoreboard);
+        }
         console.log("\r\n");
         console.log("-------------------------LOG (" + loglevel + ")-----------------------------");
         console.log("\r\n");
@@ -363,7 +396,7 @@ function printHelp() {
 
     //console.log('\033[2J'); //clear
     console.log("Call: main.js [OPTION]\n");
-    console.log("Controle a connected Bebop2 with Xbox-Controller.");
+    console.log("Control a connected Bebop2 with Xbox-Controller.");
     console.log("https://github.com/fog1992/AIS-Drone.git");
     console.log("On default the console-ui is activated.\n");
     console.table([{
@@ -424,6 +457,16 @@ function printHelp() {
         Button: '3',
         DESCRIPTION: 'activate/deactivate balance board'
     }, {
+        Button: '4',
+        DESCRIPTION: 'Start race with controller'
+    }, {
+        Button: '5',
+        DESCRIPTION: 'Start race with joystick'
+    }, {
+       Button: '6',
+       DESCRIPTION: 'Start race with balance board'
+   },
+    {
         Button: 'left',
         DESCRIPTION: 'counterclockwise'
     }, {
@@ -482,17 +525,21 @@ function printHelp() {
 
 function startRace(){
   raceModeActive = true;
-}
+};
 
 var timestamp;
 
 function startTimeMeasure(){
+  currently_racing = true;
   timestamp = Date.now();
-}
+};
 
 function stopTimeMeasure(){
-  return (Date.now() - timestamp) / 1000;
-}
+  if(currently_racing) {
+    currently_racing = false;
+    return (Date.now() - timestamp) / 1000;
+  }
+};
 
 function measureOrZero(){
   if (timestamp == 0){
@@ -500,7 +547,7 @@ function measureOrZero(){
   }else{
     return (Date.now() - timestamp) / 1000;
   }
-}
+};
 
 var times = [0, 0, 0, 0];
 var scores = [];
