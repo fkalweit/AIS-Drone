@@ -69,15 +69,26 @@ Gamepad.on("move", function(id, axis, value) {
         }
         break;
       case 2:
+          value = Math.round((value * 50) + 50);
+          log.debug("counterClockwise: " + value);
+          r.counterClockwise(value);
+          break;
+      case 3:
+        value = Math.round((value * 50) + 50);
+        log.debug("clockwise: " + value);
+        r.clockwise(value);
+        break;
+      case 4:
         value = Math.round((value * 50) + 50);
         log.debug("lifting up by: " + value);
         r.up(value);
         break;
       case 5:
         value = Math.round((value * 50) + 50);
-        log.debug("sinking down by: " + value);
-        r.down(value);
+        log.debug("lifting up by: " + value);
+        r.up(value);
         break;
+
       default:
         {}
     }
@@ -166,11 +177,11 @@ Gamepad.on("up", function(id, num) {
       switch (num) {
         case 4:
           log.debug("counterclockwise -> 0");
-          r.counterClockwise(0);
+          r.counterClockwise(100);
           break;
         case 5:
           log.debug("clockwise -> 0");
-          r.clockwise(0);
+          r.clockwise(100);
           break;
         default:
           //r.land();
