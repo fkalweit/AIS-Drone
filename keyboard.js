@@ -81,64 +81,74 @@ Cylon.robot({
       r.stop();
     });
 
+    k.keyboard.on('p', function(key){
+      log.info("TAKING PICTURE");
+      r.takePicture();
+    });
+
+    k.keyboard.on('v', function(key){
+      Drone.toggleVideoRecording();
+    });
+
+    k.keyboard.on('keyup', function(key){
+      log.info("STOP -> HOVER");
+      r.stop();
+    });
+
 	k.keyboard.on('o', function(key) {
       log.info("SetHome");
       Drone.setCurrentPositionToHome();
     });
-        k.keyboard.on('1', function(key) {
-            log.info("toggle gamepad");
 
-            Main.setControllerActivated(!Main.isControllerActivated());
-            //TODO
-        });
+  k.keyboard.on('1', function(key) {
+      log.info("toggle gamepad");
 
+      Main.setControllerActivated(!Main.isControllerActivated());
+  });
 
+  k.keyboard.on('2', function(key) {
+    log.info("toggle joystick");
 
-        k.keyboard.on('2', function(key) {
-          log.info("toggle joystick");
+    Main.setJoystickActivated(!Main.isJoystickActivated());
+  });
 
-          Main.setJoystickActivated(!Main.isJoystickActivated());
-        });
+  k.keyboard.on('3', function(key) {
 
-		      k.keyboard.on('3', function(key) {
+    log.info("toggle balanceboard");
 
-            log.info("toggle balanceboard");
+    Main.setBalanceBoardActivated(!Main.isBalanceBoardActivated());
 
-            Main.setBalanceBoardActivated(!Main.isBalanceBoardActivated());
+    //log.info("calibrate balanceboard");
+    //BalanceBoard.calibrateBoard();
+    //Main.setBalanceBoardActivated(!Main.isBalanceBoardActivated());
+    //TODO
+  });
 
-            //log.info("calibrate balanceboard");
-            //BalanceBoard.calibrateBoard();
-            //Main.setBalanceBoardActivated(!Main.isBalanceBoardActivated());
-            //TODO
-        });
+  k.keyboard.on('4', function(key) {
+      Main.startTakeTime(0);
+    });
+  k.keyboard.on('5', function(key) {
+      Main.startTakeTime(1);
+    });
+  k.keyboard.on('6', function(key) {
+      Main.startTakeTime(2);
+    });
 
+  k.keyboard.on('7', function(key) {
+      Main.stopTakeTime(0);
+    });
 
-    k.keyboard.on('4', function(key) {
-        Main.startTakeTime(0);
-      });
-      k.keyboard.on('5', function(key) {
-          Main.startTakeTime(1);
-        });
-        k.keyboard.on('6', function(key) {
-            Main.startTakeTime(2);
-          });
+  k.keyboard.on('8', function(key) {
+      Main.saveTime(0);
+    });
 
-      k.keyboard.on('7', function(key) {
-          Main.stopTakeTime(0);
-        });
-
-        k.keyboard.on('8', function(key) {
-            Main.saveTime(0);
-          });
-
-          k.keyboard.on('0', function(key) {
-              if(Main.getRaceStatus() == true){
-                Main.stopRace();
-              }else {
-                Main.startRace();
-              }
-            });
-
+  k.keyboard.on('0', function(key) {
+      if(Main.getRaceStatus() == true){
+        Main.stopRace();
+      }else {
+        Main.startRace();
+      }
+    });
 
   k.keyboard.on('left', function(key) {
               console.log("counterclockwise");
@@ -158,14 +168,6 @@ Cylon.robot({
               console.log("quit");
               process.exit(0);
   });
-
-
-
-
-	// k.keyboard.on('p', function(key) {
-  //     log.info("DISCONNECT");
-  //     r.Network.disconnect()
-  //   });
 
   }
 }).start();
