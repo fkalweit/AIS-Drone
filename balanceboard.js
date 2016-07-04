@@ -2,6 +2,7 @@ var log = require('./logger').createLogger('Board');
 var net = require('net');
 var split = require('split');
 var Drone = require('./drone');
+var Main = require('./main')
 var r = Drone.getAndActivateDrone();
 
 var calibrated = false;
@@ -13,6 +14,8 @@ var calibL = 0.0;
 
 var boardActivated = false;
 var boardConnected = false;
+
+var calibDirectionStrings = ['RECHTS','LINKS','HINTEN','VORNE']
 
 if(!Drone.isConnected()){
   log.fatal("No Drone-Connection");
@@ -29,7 +32,7 @@ var server = net.createServer(function(connection) {
     boardConnected = true;
     Drone.setBoardConnected(true);
 
-    if(boardConnected && boardActivated){
+    if (boardConnected && Main.isBalanceBoardActivated()) {
       if(!Drone.isConnected()){
         log.fatal("No Drone-Connection");
       }else{
@@ -41,21 +44,21 @@ var server = net.createServer(function(connection) {
 
             if(massX > 0.1){
               massX = Math.round(massX * 100) * (100 / calibR);
-              log.info("moving right by: " + massX);
+              log.debug("moving right by: " + massX);
               r.right(massX);
             }else if(massX < -0.1){
               massX = Math.round(massX * -100) * (100 / -calibL);
-              log.info("moving left by: " + massX);
+              log.debug("moving left by: " + massX);
               r.left(massX);
             }
 
             if(massY > 0.1){
               massY = Math.round(massY * 100) * (100 / calibB);
-              log.info("moving backward by: " + massY);
+              log.debug("moving backward by: " + massY);
               r.backward(massY);
             }else if(massY < -0.1){
               massY = Math.round(massY * -100) * (100 / -calibF);
-              log.info("moving forward by: " + massY);
+              log.debug("moving forward by: " + massY);
               r.forward(massY);
             }
         }
@@ -64,8 +67,8 @@ var server = net.createServer(function(connection) {
   });
 
   connection.on ('end', function(status){
-    balanceboardconnected = false;
-    Drone.setBoardConnected(false);
+    boardConnected = false;
+    //Drone.setBoardConnected(false);
     log.error('Balance Board Disconnected -> Hovering');
     r.stop();
   });
@@ -86,20 +89,20 @@ function calibrate(data){
 
     if(massX > 0.1 && axe == 0){
       calibR = max(massX, calibR);
-      log.info("R-Max: " + calibR);
+      log.debug("R-Max: " + calibR);
     }else if(massX < -0.1 && axe == 1){
       calibL = min(massX, calibL);
-      log.info("L-Max: " + calibL);
+      log.debug("L-Max: " + calibL);
     }else{
       //r.drone.hover();
     }
 
     if(massY > 0.1 && axe == 2){
       calibB = max(massY, calibB);
-      log.info("B-Max: " + calibB);
+      log.debug("B-Max: " + calibB);
     }else if(massY < -0.1 && axe == 3){
       calibF = min(massY, calibF);
-      log.info("F-Max: " + calibF);
+      log.debug("F-Max: " + calibF);
     }else{
       //r.drone.stop();
     }
@@ -107,7 +110,8 @@ function calibrate(data){
 
 function startCalibInterval(){
   axe++;
-  log.info("Achse: " + axe + " wird kalibriert");
+  //log.info("Achse: " + axe + " wird kalibriert");
+  log.info("Nach " + calibDirectionStrings[axe] + " lehnen!!!" );
   setTimeout(function () {
     if(axe < 3){
       startCalibInterval();
@@ -134,26 +138,13 @@ function min(a, b){
 }
 
 module.exports = {
-  enableBoard: function(){
-    if(boardConnected){
-      boardActivated = true;
-      Drone.setBoardConnected(true);
-      Drone.setBoardActivated(true);
-    }else{
-      log.error('Can not activate board, because it is not connected');
+
+    isConnected: function() {
+        return boardConnected;
+    },
+
+    calibrateBoard: function() {
+        calibrate();
     }
-  },
 
-  disableBoard: function(){
-    boardActivated = false;
-    Drone.setBoardActivated(false);
-  },
-
-  isEnabled: function(){
-    return boardActivated;
-  },
-
-  isConnected: function(){
-    return boardConnected;
-  }
 };

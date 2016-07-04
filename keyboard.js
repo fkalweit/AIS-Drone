@@ -10,6 +10,8 @@ var Drone = require('./drone');
 
 var Gamepad = require("gamepad");
 
+var BalanceBoard = require('./balanceboard')
+
 var Main = require('./main');
 
 var log = require('./logger').createLogger('Keyboard');
@@ -83,16 +85,61 @@ Cylon.robot({
       log.info("SetHome");
       Drone.setCurrentPositionToHome();
     });
+        k.keyboard.on('1', function(key) {
+            log.info("toggle gamepad");
 
-  k.keyboard.on('1', function(key) {
-        log.info("toggle gamepad");
-        Main.controllerActivated = !Main.controllerActivated;
-        //TODO
-    });
+            Main.setControllerActivated(!Main.isControllerActivated());
+            //TODO
+        });
 
-    k.keyboard.on('0', function(key) {
-          //TODO
+
+
+        k.keyboard.on('2', function(key) {
+          log.info("toggle joystick");
+
+          Main.setJoystickActivated(!Main.isJoystickActivated());
+        });
+
+		      k.keyboard.on('3', function(key) {
+
+            log.info("toggle balanceboard");
+
+            Main.setBalanceBoardActivated(!Main.isBalanceBoardActivated());
+
+            //log.info("calibrate balanceboard");
+            //BalanceBoard.calibrateBoard();
+            //Main.setBalanceBoardActivated(!Main.isBalanceBoardActivated());
+            //TODO
+        });
+
+
+    k.keyboard.on('4', function(key) {
+        Main.startTakeTime(0);
       });
+      k.keyboard.on('5', function(key) {
+          Main.startTakeTime(1);
+        });
+        k.keyboard.on('6', function(key) {
+            Main.startTakeTime(2);
+          });
+
+      k.keyboard.on('7', function(key) {
+          Main.stopTakeTime(0);
+        });
+
+        k.keyboard.on('8', function(key) {
+            Main.saveTime(0);
+          });
+
+          k.keyboard.on('0', function(key) {
+              if(Main.getRaceStatus() == true){
+                Main.stopRace();
+              }else {
+                Main.startRace();
+              }
+            });
+
+
   k.keyboard.on('left', function(key) {
         log.info("counterclockwise");
         r.counterClockwise(100);
@@ -100,6 +147,12 @@ Cylon.robot({
   k.keyboard.on('right', function(key) {
         log.info("clockwise");
         r.clockwise(100);
+  });
+
+  k.keyboard.on('return', function(key) {
+              r.stop();
+              log.debug("Hover");
+              Main.deactivateAll();
   });
   k.keyboard.on('end', function(key) {
         log.info("quit");

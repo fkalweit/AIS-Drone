@@ -8,15 +8,105 @@ var controllerActivated = false;
 var balanceBoardActivated = false;
 var joystickActivated = false;
 
-var raceModeAvtive = false;
+var geofencingradius = 10;
 
-var boardConnected = false;
+var playernumber = 1;
+var currentDevice = "n";
+var raceModeActive = false;
 
 var Table = require('console.table');
 var os = require('os');
 var log = require('./logger').createLogger('Main', loglevel);
+var clear = require('cli-clear');
 
 
+module.exports = {
+
+    isControllerActivated: function() {
+        return controllerActivated;
+    },
+
+    setControllerActivated: function(val) {
+        if (Controller.isConnected()) {
+            controllerActivated = val;
+        } else {
+            log.info('Controller is not connected!');
+            controllerActivated = false;
+        }
+    },
+
+    isBalanceBoardActivated: function() {
+        return balanceBoardActivated;
+    },
+
+    setBalanceBoardActivated: function(val) {
+        if (BalanceBoard.isConnected()) {
+            balanceBoardActivated = val;
+        } else {
+            log.info('Balance Board is not connected!');
+            balanceBoardActivated = false;
+        }
+
+    },
+
+    isJoystickActivated: function() {
+        return joystickActivated;
+    },
+
+    setJoystickActivated: function(val) {
+      if(Joystick.isConnected()) {
+        joystickActivated = val;
+      }  else {
+          log.info('Joystick is not connected!');
+          joystickActivated = false;
+      }
+    },
+    startRace: function(){
+      raceModeActive = true;
+      scores = [];
+      timestamp = 0;
+      times = [0,0,0,0,0];
+      playernumber = 1;
+      clear();
+    },
+    stopRace: function(){
+      raceModeActive = false;
+      clear();
+    },
+    getRaceStatus: function(){
+        return raceModeActive;
+    },
+    startTakeTime: function(device){
+      currentDevice = device;
+      startTimeMeasure();
+    },
+    stopTakeTime: function(){
+      times[currentDevice] = stopTimeMeasure();
+      timestamp = 0;
+    },
+    saveTime: function(){
+      if(!(times[0] == 0 && times[1] == 0 && times[2] == 0)){
+                          times[3] = (3 * times[0] + 2 * times[1] + 1 * times[2]);
+              times[4] = playernumber;
+              playernumber = playernumber + 1;
+              scores.push(times);
+              times = [0, 0, 0, 0, 0];
+              clear();
+          }
+    },
+    getTimes: function(){
+      return times;
+    },
+    getScores: function(){
+      return scores;
+    },
+
+    deactivateAll: function() {
+        balanceBoardActivated = false;
+        controllerActivated = false;
+        joystickActivated = false;
+    }
+};
 
 process.argv.forEach(function(val, index, array) {
     //console.log(index + ': ' + val);   // Für Debug des switch
@@ -45,6 +135,7 @@ process.argv.forEach(function(val, index, array) {
         case "-l":
         case "--log":
             loglevel = parseInt(array[index + 1]);
+            var log = require('./logger').createLogger('Main', loglevel);
             array.splice(index, 1);
             break;
           case "-m":
@@ -55,6 +146,11 @@ process.argv.forEach(function(val, index, array) {
         case "--no-ui":
             withgui = false;
             break;
+        case "-r":
+        case "--geofencingradius":
+               geofencingradius = parseInt(array[index + 1]);
+               array.splice(index, 1);
+               break;
         default:
             if (index > 1) {
                 log.error("Unknown arg.");
@@ -69,11 +165,18 @@ process.argv.forEach(function(val, index, array) {
 // if no log_level is passed, the previous set will be used.
 // Then u can do log.x for x € [trace, debug, info, warn, error, fatal]
 
+var Controller = require('./xbox')
+
 var Drone = require('./drone');
+Drone.setAreaRadiusInMeter(geofencingradius);
+
+var Controller = require('./xbox');
 
 var Keyboard = require('./keyboard');
 
-var Controller = require('./xbox')
+var Joystick = require('./attack');
+
+var BalanceBoard = require('./balanceboard')
 
 if (os.platform() == "win32" || os.platform() == "win64") {
   log.info("WiiRemote does not work with Windows.")
@@ -81,17 +184,17 @@ if (os.platform() == "win32" || os.platform() == "win64") {
 else {
   var spawn = require("child_process").spawn;
   var myapp = spawn('java', ['-jar', 'WiiRemoteJ.jar']);
-          myapp.stdout.on('data', function (data) {
-              log.debug(data.toString());
-          });
+        myapp.stdout.on('data', function (data) {
+            log.debug(data.toString());
+        });
 
-          myapp.stderr.on('data', function (data) {
-              log.debug(data.toString());
-          });
+        myapp.stderr.on('data', function (data) {
+            log.debug(data.toString());
+        });
 
-          myapp.on('exit', function (code) {
-              log.debug('child process exited with code ' + code);
-          });
+        myapp.on('exit', function (code) {
+            log.debug('child process exited with code ' + code);
+        });
 }
 
 
@@ -100,15 +203,15 @@ var r = Drone.getAndActivateDrone();
 process.on('exit', (code) => {
   r.Network.disconnect();
   myapp.kill('SIGKILL');
-  console.log("Disconnected from the drone");
-  console.log('About to exit with code:', code);
+  log.info("Disconnected from the drone");
+  log.info('About to exit with code:', code);
 });
 
 process.on('SIGINT', function() {
   r.Network.disconnect();
   myapp.kill('SIGKILL');
-  console.log(" ");
-  console.log("Caught interrupt signal");
+  log.info(" ");
+  log.info("Caught interrupt signal");
   process.exit();
 });
 
@@ -144,6 +247,9 @@ setTimeout(function() {
         //if(stream) var MJpegStream = require('./mjpeg');
 
         console.log('\033[2J');
+        if(withgui){
+          clear();
+        }
         setInterval(function() {
             if (withgui) {
                 process.stdout.cursorTo(0, -1); // move cursor to beginning of line
@@ -156,16 +262,36 @@ setTimeout(function() {
 }, 1500);
 
 function printGUI() {
+        console.log("\r\n");
+        console.log("-------------------------STATUS-----------------------------");
+        console.log("\r\n");
         console.table([{
             State: 'Is Connected: ',
             CurrentValue: String(Drone.isConnected())
+        },
+          {
+              State: 'Racemode: ',
+              CurrentValue: String(raceModeActive)
+          },
+         {
+        	  State: 'Controller Connected: ',
+        	  CurrentValue: Controller.isConnected()
+    	  }, {
+        	  State: 'Controller Activated: ',
+        	  CurrentValue: controllerActivated
+    	  }, {
+            State: 'Joystick Connected: ',
+            CurrentValue: Joystick.isConnected()
         }, {
+            State: 'Joystick Activated: ',
+            CurrentValue: joystickActivated
+    	  }, {
             State: 'Balance Board Connected: ',
-            CurrentValue: boardConnected
+            CurrentValue: BalanceBoard.isConnected()
         }, {
             State: 'Balance Board Activated: ',
             CurrentValue: balanceBoardActivated
-        }, {
+    	  }, {
             State: 'Drohnen Status: ',
             CurrentValue: Drone.getState()
         }, {
@@ -187,7 +313,12 @@ function printGUI() {
         }, {
             State: 'DistanceFromHome: ',
             CurrentValue: Drone.getCurrentDistanceFromHome()
-        }, {
+        },
+{
+            State: 'AreaRadiusInMeter: ',
+            CurrentValue: Drone.getAreaRadiusInMeter()
+        },
+        {
             State: 'OutOfArea: ',
             CurrentValue: Drone.getOutOfArea()
         }, {
@@ -195,8 +326,35 @@ function printGUI() {
             CurrentValue: Drone.getOutOfAreaContextState()
         }]);
 
+        if(raceModeActive){
+
         console.log("\r\n");
+        console.log("-------------------------RACEMODE-----------------------------");
         console.log("\r\n");
+        console.log("Device: "+ currentDevice + " CurrentMeasure: " + measureOrZero().toFixed(2));
+        console.log("\r\n");
+
+        console.table([{
+          CurRun: "",
+          Xbox: times[0].toFixed(2),
+          Joystick: times[1].toFixed(2),
+          BalanceBoard: times[2].toFixed(2)
+        }]);
+
+        scoreboard = [{Player: "", Score: "", Xbox: "", Joystick: "", BalanceBoard: "" }];
+
+        scores.sort(function(a,b){return (a[3] - b[3]);});
+
+        scores.forEach(function(item){
+           scoreboard.push({Player: item[4], Score: item[3].toFixed(2), Xbox: item[0].toFixed(2), Joystick: item[1].toFixed(2), BalanceBoard: item[2].toFixed(2) });
+        });
+
+        console.table(scoreboard);
+}
+        console.log("\r\n");
+        console.log("-------------------------LOG (" + loglevel + ")-----------------------------");
+        console.log("\r\n");
+
 
 };
 
@@ -261,6 +419,9 @@ function printHelp() {
         DESCRIPTION: 'activate/deactivate gamepad'
     }, {
         Button: '2',
+        DESCRIPTION: 'activate/deactivate joystick'
+    }, {
+        Button: '3',
         DESCRIPTION: 'activate/deactivate balance board'
     }, {
         Button: 'left',
@@ -319,31 +480,32 @@ function printHelp() {
 
 };
 
-module.exports.controllerActivated = controllerActivated;
+function startRace(){
+  raceModeActive = true;
+}
+
+var timestamp;
+
+function startTimeMeasure(){
+  timestamp = Date.now();
+}
+
+function stopTimeMeasure(){
+  return (Date.now() - timestamp) / 1000;
+}
+
+function measureOrZero(){
+  if (timestamp == 0){
+    return 0;
+  }else{
+    return (Date.now() - timestamp) / 1000;
+  }
+}
+
+var times = [0, 0, 0, 0];
+var scores = [];
+
+//module.exports.controllerActivated = controllerActivated;
 
 // Export-Methoden des Moduls.
 // Ermöglicht Aufruf der Funktionen in anderen Modulen.
-module.exports = {
-
-  // evtl. Variablen direkt im Export
-
-
-    getControllerActivated: function() {
-        return controllerActivated;
-    },
-    setControllerActivated: function(val) {
-        controllerActivated = val;
-    },
-    getBalanceBoardActivated: function() {
-        return balanceBoardActivated;
-    },
-    setBalanceBoardActivated: function(val) {
-        balanceBoardActivated = val;
-    },
-    getJoystickActivated: function() {
-        return joystickActivated;
-    },
-    setJoystickActivated: function(val) {
-        joystickActivated = val;
-    }
-}
