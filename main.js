@@ -1,7 +1,7 @@
 var stream = false;
 var log = false;
 
-var loglevel = 20;
+var loglevel = 30;
 var withgui = true;
 
 var controllerActivated = false;
@@ -21,7 +21,6 @@ var Table = require('console.table');
 var os = require('os');
 var log = require('./logger').createLogger('Main', loglevel);
 var clear = require('cli-clear');
-
 
 module.exports = {
 
@@ -80,7 +79,7 @@ module.exports = {
       timestamp = 0;
       times = [0,0,0,0,0];
       playernumber = 1;
-      clear();
+      process.stdout.cursorTo(0, -1);
     },
     stopRace: function(){
       raceModeActive = false;
@@ -277,15 +276,16 @@ setTimeout(function() {
         if (stream) Controller.start_stream(true);
         //if(stream) var MJpegStream = require('./mjpeg');
 
-        console.log('\033[2J');
+        //console.log('\033[2J');
         if(withgui){
           clear();
         }
         setInterval(function() {
             if (withgui) {
                 process.stdout.cursorTo(0, -1); // move cursor to beginning of line
-                process.stdout.clearLine(); // clear current text
+                //process.stdout.clearLine(); // clear current text
                 printGUI();
+
             }
         }, 200);
 
@@ -387,6 +387,7 @@ function printGUI() {
         console.log("\r\n");
         console.log("-------------------------LOG (" + loglevel + ")-----------------------------");
         console.log("\r\n");
+
 
 
 };
