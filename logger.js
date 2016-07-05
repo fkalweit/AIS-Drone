@@ -1,8 +1,17 @@
 var Bunyan = require('bunyan');
 var PrettyStream = require('bunyan-prettystream');
 
+var prettyLogFile = new PrettyStream();
+
 var prettyStdOut = new PrettyStream();
 prettyStdOut.pipe(process.stdout);
+
+var fs = require('fs');
+var logStream = fs.createWriteStream('./logFile.log', {flags: 'a'});
+
+prettyLogFile.pipe(logStream);
+//prettyLogFile.pipe(fs);
+
 
 // trace = 10, debug = 20, info = 30, warn = 40, error = 50, fatal = 60
 var logLevel = 20;
@@ -10,10 +19,15 @@ var log = buildLogger('Logger', logLevel);
 
 function buildLogger(filename, lvl){
   return Bunyan.createLogger({name: filename, level: lvl, streams: [{
-                level: lvl,
+                level: 'trace',
                 type: 'raw',
-                stream: prettyStdOut
-            }]});
+                stream: prettyLogFile
+            },
+            {
+              level: lvl,
+              stream: prettyStdOut
+            }
+          ]});
 }
 
 
