@@ -178,7 +178,7 @@ process.argv.forEach(function(val, index, array) {
             break;
         case "-r":
         case "--geofencingradius":
-               geofencingradius = parseInt(array[index + 1]);
+               geofencingradius = parseFloat(array[index + 1]);
                array.splice(index, 1);
                break;
         default:
@@ -405,20 +405,24 @@ function printHelp() {
         OPTION2: '--help',
         DESCRIPTION: 'Prints this table'
     }, {
-        OPTION: '-s',
-        OPTION2: '--stream',
-        DESCRIPTION: 'Streams MJpeg from drone (only on Unix)'
-    }, {
-        OPTION: '-v',
-        OPTION2: '--verbose',
-        DESCRIPTION: 'Prints debug log on stdout and disables the GUI'
+        OPTION: '-r <radius>',
+        OPTION2: '--geofencingradius <radius>',
+        DESCRIPTION: 'Set Geofencing-Radius (in m)'
     }, {
         OPTION: '-l <level>',
         OPTION2: '--log <level>',
         DESCRIPTION: 'Set loglevel to <loglevel>'
     }, {
+        OPTION: '-v',
+        OPTION2: '--verbose',
+        DESCRIPTION: 'Prints debug log on stdout and disables the GUI'
+    }, {
         OPTION2: '--no-ui',
         DESCRIPTION: "Disables the console user interface"
+    }, {
+        OPTION: '-s',
+        OPTION2: '--stream',
+        DESCRIPTION: 'Streams MJpeg from drone (only on Unix)'
     }]);
     console.log("Assignment of keyboard keys:\n");
     console.table([{
