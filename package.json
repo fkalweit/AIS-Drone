@@ -1,55 +1,56 @@
 {
-	"name": "AIS-Drone",
-	"version": "0.1.0",
-	"description": "Projekt für AIS Seminar HS-KL",
-	"keywords": [
-		"drone",
-		"bebop",
-		"HS-KL",
-		"AIS"
-	],
-	"bugs": {
-		"url": "https://github.com/fog1992/AIS-Drone/issues"
-	},
+  "name": "AIS-Drone",
+  "version": "0.1.0",
+  "description": "Projekt für AIS Seminar HS-KL",
+  "keywords": [
+    "drone",
+    "bebop",
+    "HS-KL",
+    "AIS"
+  ],
+  "bugs": {
+    "url": "https://github.com/fog1992/AIS-Drone/issues"
+  },
   "author": "Templin, Oswald, Puderer, Kalweit",
-	"contributors": [
-		{
-			"name": "Templin Stefan"
-		},
-		{
-			"name": "Oswald Florian"
-		},
-		{
-			"name": "Puderer Tobias"
-		},
-		{
-			"name": "Kalweit Fabian"
-		}
-	],
-	"scripts": {
+  "contributors": [
+    {
+      "name": "Templin Stefan"
+    },
+    {
+      "name": "Oswald Florian"
+    },
+    {
+      "name": "Puderer Tobias"
+    },
+    {
+      "name": "Kalweit Fabian"
+    }
+  ],
+  "scripts": {
     "start": "node main.js"
-	},
-	"main": "main.js",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/fog1992/AIS-Drone.git"
-	},
-	"dependencies": {
-		"fluent-ffmpeg": "~2.1.0",
-		"opencv": ">=5.0.0",
-		"gamepad": "~1.2.2",
-		"node-bebop": "0.6.0",
-		"console.table": ">=0.4.0",
-		"net": ">=1.0.2",
-    "split": ">=1.0.0",
-		"bunyan": ">=1.8.1",
-		"bunyan-prettystream": ">=0.1.3",
-		"cylon": "1.3.0",
-		"cylon-keyboard": ">=0.17.0",
-		"os": "0.1.1",
-		"cli-clear": "1.0.4",
-		"colors": "1.1.2"
-	},
-	"private": true,
-	"engine": "node ~0.4.0"
+  },
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fog1992/AIS-Drone.git"
+  },
+  "dependencies": {
+    "bunyan": ">=1.8.1",
+    "bunyan-prettystream": ">=0.1.3",
+    "cli-clear": "1.0.4",
+    "clui": "^0.3.1",
+    "colors": "1.1.2",
+    "console.table": ">=0.4.0",
+    "cylon": "1.3.0",
+    "cylon-keyboard": ">=0.17.0",
+    "fluent-ffmpeg": "~2.1.0",
+    "gamepad": "~1.2.2",
+    "net": ">=1.0.2",
+    "node-bebop": "0.6.0",
+    "opencv": ">=5.0.0",
+    "os": "0.1.1",
+    "split": ">=1.0.0"
+  },
+  "private": true,
+  "engine": "node ~0.4.0"
 }
