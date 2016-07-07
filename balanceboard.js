@@ -117,6 +117,7 @@ function startCalibInterval(){
       startCalibInterval();
     }else if(axe >= 3){
       calibrated = true;
+      log.info("Fertig");
     }
   }, 5000);
 }

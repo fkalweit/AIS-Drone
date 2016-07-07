@@ -39,7 +39,7 @@
     "bunyan-prettystream": ">=0.1.3",
     "cli-clear": "1.0.4",
     "clui": "^0.3.1",
-    "colors": "1.1.2",
+    "colors": "^1.1.2",
     "console.table": ">=0.4.0",
     "cylon": "1.3.0",
     "cylon-keyboard": ">=0.17.0",
