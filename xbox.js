@@ -178,17 +178,30 @@ Gamepad.on("down", function(id, num) {
                             //r.Piloting.navigateHome(1);
                             break;
                         case 7:
-                            //log.debug("aborted flying home...");
-                            //r.Piloting.navigateHome(0);
-                            break;
-                        case 8:
-                            Drone.toggleVideoRecording();
-                            break;
-                        case 9:
                             log.debug("TAKING PICTURE");
                             r.takePicture();
+                            //log.debug("aborted flying home...");
+                            //r.Piloting.navigateHome(0);
+                            //Drone.toggleVideoRecording();
+                            break;
+                        case 8:
+                            //Drone.toggleVideoRecording();
+                            break;
+                        case 9:
                             break;
                         case 10:
+                            break;
+                        case 11:
+                            r.leftFlip();
+                            break;
+                        case 12:
+                            r.rightFlip();
+                            break;
+                        case 13:
+                            r.frontFlip();
+                            break;
+                        case 14:
+                            r.backFlip();
                             break;
                         default:
                             r.land();
