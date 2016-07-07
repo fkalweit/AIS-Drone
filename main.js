@@ -284,11 +284,18 @@ setTimeout(function() {
         if(withgui){
           clear();
         }
+        var i = 0;
         setInterval(function() {
             if (withgui) {
+                i++;
                 process.stdout.cursorTo(0, -1); // move cursor to beginning of line
                 //process.stdout.clearLine(); // clear current text
                 printGUI();
+                if(i == 10) {
+                  process.stdout.clearLine();
+                  i = 0;
+                  //process.stdout.cursorTo(0, -1);
+                }
 
             }
         }, 200);
