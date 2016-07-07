@@ -246,6 +246,44 @@ process.on('SIGINT', function() {
 });
 
 setTimeout(function() {
+  if (stream) {
+    console.log(stream);
+    var cv = require("opencv");
+
+    var mjpg = r.getMjpegStream(),
+      buf = null,
+      w = new cv.NamedWindow("Video", 0);
+
+    mjpg.on("data", function(data) {
+      buf = data;
+    });
+
+    setInterval(function() {
+      if (buf == null) {
+        return;
+      }
+
+      try {
+        cv.readImage(buf, function(err, im) {
+          if (err) {
+            log.error(err);
+          } else {
+            if (im.width() < 1 || im.height() < 1) {
+              log.info("no width or height");
+              return;
+            }
+            w.show(im);
+            w.blockingWaitKey(0, 50);
+          }
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }, 80);
+  }
+}, 1000);
+
+setTimeout(function() {
       //DEFAULT: start xbox with ui without log + no stream
       if (!Drone.isConnected()) {
         log.fatal("No Drone-Connection");
@@ -272,9 +310,6 @@ setTimeout(function() {
         Controller.setDrone(r);
 
         Keyboard.setDrone(r);
-
-        if (stream) Controller.start_stream(true);
-        //if(stream) var MJpegStream = require('./mjpeg');
 
         //console.log('\033[2J');
         if(withgui){
@@ -527,6 +562,9 @@ function printHelp() {
     console.log("\n");
 
 };
+
+
+
 
 function startRace(){
   raceModeActive = true;
