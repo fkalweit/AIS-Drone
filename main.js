@@ -31,7 +31,7 @@ module.exports = {
 
     setControllerActivated: function(val) {
         if (Controller.isConnected()) {
-            deactivateAllControllers();
+            // deactivateAllControllers();
             controllerActivated = val;
             if(val===true) {
               currentDevice = 0
@@ -47,7 +47,7 @@ module.exports = {
 
     setJoystickActivated: function(val) {
       if(Joystick.isConnected()) {
-        deactivateAllControllers();
+        // deactivateAllControllers();
         joystickActivated = val;
         if(val===true) {
           currentDevice = 1
@@ -63,7 +63,7 @@ module.exports = {
 
     setBalanceBoardActivated: function(val) {
         if (BalanceBoard.isConnected()) {
-            deactivateAllControllers();
+            //deactivateAllControllers();
             balanceBoardActivated = val;
             if(val===true) {
               currentDevice = 2
@@ -99,8 +99,10 @@ module.exports = {
       }
     },
     stopTakeTime: function(){
+      //if(timestamp != 0){
       times[currentDevice] = stopTimeMeasure();
       timestamp = 0;
+      //}
     },
     abortTakeTime: function(){
       times[currentDevice] = '-1';
@@ -114,7 +116,7 @@ module.exports = {
                 playernumber = playernumber + 1;
                 scores.push(times);
                 times = [0, 0, 0, 0, 0];
-                clear();
+                //clear();
             }
         } else {
           log.info('Could not save time. Race Mode is not activated')
@@ -289,7 +291,7 @@ setTimeout(function() {
 
 setTimeout(function() {
       //DEFAULT: start xbox with ui without log + no stream
-      if (!Drone.isConnected()) {
+      if (Drone.isConnected()) {
         log.fatal("No Drone-Connection");
         var CLI = require('clui'),
           Spinner = CLI.Spinner;
@@ -323,6 +325,7 @@ setTimeout(function() {
         setInterval(function() {
             if (withgui) {
                 i++;
+                clear();
                 process.stdout.cursorTo(0, -1); // move cursor to beginning of line
                 //process.stdout.clearLine(); // clear current text
                 printGUI();
@@ -343,7 +346,8 @@ function printGUI() {
         if (Drone.isConnected()) {
           var droneConnection =String(Drone.isConnected()).green
         }else {
-          var droneConnection = String(Drone.isConnected()).red
+          var droneConnection = "true".green;
+          //var droneConnection = String(Drone.isConnected()).red
         }
         if (raceModeActive) {
           var raceMode =  String(raceModeActive).green //+  String(raceModeActive).green
@@ -469,7 +473,7 @@ function printGUI() {
           console.log("-------------------------RACEMODE-----------------------------");
           console.log("\r\n");
 
-          console.log("")
+          console.log("\r\n")
           console.log("Active Device: "+ deviceNames[currentDevice] + "  Time: " + measureOrZero().toFixed(2));
           console.log("\r\n");
 
