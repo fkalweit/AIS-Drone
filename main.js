@@ -21,6 +21,7 @@ var Table = require('console.table');
 var os = require('os');
 var log = require('./logger').createLogger('Main', loglevel);
 var clear = require('cli-clear');
+var colors = require('colors');
 
 module.exports = {
 
@@ -293,36 +294,99 @@ setTimeout(function() {
 }, 1500);
 
 function printGUI() {
+
+        if (Drone.isConnected()) {
+          var droneConnection =String(Drone.isConnected()).green
+        }else {
+          var droneConnection = String(Drone.isConnected()).red
+        }
+        if (raceModeActive) {
+          var raceMode =  String(raceModeActive).green //+  String(raceModeActive).green
+        }else {
+          var raceMode = String(raceModeActive).red //+ String(raceModeActive).red
+        }
+        if (Controller.isConnected()) {
+          var controller_connected = String(Controller.isConnected()).green
+        }else {
+          var controller_connected = String(Controller.isConnected()).red
+        }
+        if (controllerActivated) {
+          var controller = String(Controller.isConnected()).green
+        }else {
+          var controller = String(controllerActivated).red
+        }
+        if (Joystick.isConnected()) {
+          var joystick_connected = String(Joystick.isConnected()).green
+        }else {
+          var joystick_connected = String(Joystick.isConnected()).red
+        }
+        if (joystickActivated) {
+          var joystick = String(joystickActivated).green
+        }else {
+          var joystick = String(joystickActivated).red
+        }
+        if (BalanceBoard.isConnected()) {
+          var BB_connected = String(BalanceBoard.isConnected()).green
+        }else {
+          var BB_connected = String(BalanceBoard.isConnected()).red
+        }
+        if (balanceBoardActivated) {
+          var balanceBoard = String(balanceBoardActivated).green
+        }else {
+          var balanceBoard = String(balanceBoardActivated).red
+        }
+        if (Drone.getOutOfArea()) {
+          var outOfArea = String(Drone.getOutOfArea()).red
+        }else {
+          var outOfArea = String(Drone.getOutOfArea()).grey
+        }
+
+
         console.log("\r\n");
         console.log("-------------------------STATUS-----------------------------");
         console.log("\r\n");
         console.table([{
             State: 'Is Connected: ',
-            CurrentValue: String(Drone.isConnected())
+            CurrentValue: droneConnection
         },
           {
               State: 'Racemode: ',
-              CurrentValue: String(raceModeActive)
+              CurrentValue: raceMode
+          },
+          {
+            CurrentValue: ""
           },
          {
         	  State: 'Controller Connected: ',
-        	  CurrentValue: Controller.isConnected()
+        	  CurrentValue: controller_connected
     	  }, {
         	  State: 'Controller Activated: ',
-        	  CurrentValue: controllerActivated
-    	  }, {
+        	  CurrentValue: controller
+    	  },
+        {
+          CurrentValue: ""
+        },
+        {
             State: 'Joystick Connected: ',
-            CurrentValue: Joystick.isConnected()
+            CurrentValue: joystick_connected
         }, {
             State: 'Joystick Activated: ',
-            CurrentValue: joystickActivated
-    	  }, {
+            CurrentValue: joystick
+    	  },
+        {
+          CurrentValue: ""
+        },
+        {
             State: 'Balance Board Connected: ',
-            CurrentValue: BalanceBoard.isConnected()
+            CurrentValue: BB_connected
         }, {
             State: 'Balance Board Activated: ',
-            CurrentValue: balanceBoardActivated
-    	  }, {
+            CurrentValue: balanceBoard
+    	  },
+        {
+          CurrentValue: ""
+        },
+        {
             State: 'Drohnen Status: ',
             CurrentValue: Drone.getState()
         }, {
@@ -351,10 +415,7 @@ function printGUI() {
         },
         {
             State: 'OutOfArea: ',
-            CurrentValue: Drone.getOutOfArea()
-        }, {
-            State: 'OutOfAreaContextState: ',
-            CurrentValue: Drone.getOutOfAreaContextState()
+            CurrentValue: outOfArea
         }]);
 
         if(raceModeActive){
@@ -387,9 +448,6 @@ function printGUI() {
         console.log("\r\n");
         console.log("-------------------------LOG (" + loglevel + ")-----------------------------");
         console.log("\r\n");
-
-
-
 };
 
 
