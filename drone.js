@@ -2,8 +2,9 @@
 var distanceCalc = require('./GpsDistanceCalculator');
 var areaRadiusInMeter = 2;
 var isOutOfArea = false;
+var wasOutOfArea = false;
 var currentDistanceFromHome = -1;
-var OutOfAreaContextState = "";
+var OutOfAreaContextState = "no area def.";
 //Geofencing-Variablen - Ende
 
 var Main = require('./main');
@@ -77,6 +78,7 @@ drone.connect(function() {
         h_altitude = pos.altitude;
         h_longitude = pos.longitude;
         h_latitude = pos.latitude;
+        OutOfAreaContextState = "Drone is in area";
     });
 
     drone.on("NumberOfSatelliteChanged", function(num) {
@@ -88,27 +90,35 @@ drone.connect(function() {
         longitude = pos.longitude;
         latitude = pos.latitude;
 
-        if(Main.isCurrentlyRacing()) {
+
+        //if(Main.getRaceStatus()) {
 
           if (!((h_longitude == 0) && (h_latitude == 0))) {
 
               var lastDistanceFromHome = currentDistanceFromHome
               currentDistanceFromHome = distanceCalc.getDistanceInMeter(h_latitude, h_longitude, latitude, longitude);
 
-              var wasOutOfArea = isOutOfArea;
+
               isOutOfArea = (currentDistanceFromHome > areaRadiusInMeter);
 
-              OutOfAreaContextState = "unknown";
+              //OutOfAreaContextState = "unknown";
 
-              if (isOutOfArea) {
-                console.log("Drone leaves Area");
-                OutOfAreaContextState = "hat_Bereich_verlassen";
+              if (isOutOfArea AND !wasOutOfArea) {
+
+                log.info("Drone leaves Area");
+                OutOfAreaContextState = "Drone is out of area";
                 Main.deactivateAll();
                 Main.abortTakeTime();
                 drone.stop();
+                wasOutOfArea = true;
+
+              }else if (!isOutOfArea AND wasOutOfArea) {
+                log.info("Drone enters Area");
+                OutOfAreaContextState = "Drone is in area";
+                wasOutOfArea = false;
               }
           }
-        }
+        //}
     });
 });
 // Export-Methoden des Moduls.

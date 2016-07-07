@@ -8,7 +8,7 @@ var controllerActivated = false;
 var balanceBoardActivated = false;
 var joystickActivated = false;
 
-var geofencingradius = 10;
+var geofencingradius = 50;
 
 //Race Mode
 var playernumber = 1;
@@ -105,7 +105,6 @@ module.exports = {
       //}
     },
     abortTakeTime: function(){
-      times[currentDevice] = '-1';
       timestamp = 0;
     },
     saveTime: function(){
