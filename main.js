@@ -80,7 +80,8 @@ module.exports = {
       timestamp = 0;
       times = [0,0,0,0,0];
       playernumber = 1;
-      process.stdout.cursorTo(0, -1);
+      clear();
+      //process.stdout.cursorTo(0, -1);
     },
     stopRace: function(){
       raceModeActive = false;
@@ -169,10 +170,12 @@ process.argv.forEach(function(val, index, array) {
             var log = require('./logger').createLogger('Main', loglevel);
             array.splice(index, 1);
             break;
-          case "-m":
-          case "--modus":
-            raceModeAvtive = parseInt(array[index + 1]);
-            array.splice(index, 1);
+          case "--race-mode":
+            raceModeActive = true;
+            scores = [];
+            timestamp = 0;
+            times = [0,0,0,0,0];
+            playernumber = 1;
             break;
         case "--no-ui":
             withgui = false;
@@ -455,7 +458,8 @@ function printHelp() {
 
     //console.log('\033[2J'); //clear
     console.log("Call: main.js [OPTION]\n");
-    console.log("Control a connected Bebop2 with Xbox-Controller.");
+    console.log("Control a connected Bebop2 with Keyboard, \nXbox-Controller, Attack3, BalanceBoard.");
+    console.log("Keyboard is the main controll unit. ");
     console.log("https://github.com/fog1992/AIS-Drone.git");
     console.log("On default the console-ui is activated.\n");
     console.table([{
@@ -466,6 +470,9 @@ function printHelp() {
         OPTION: '-r <radius>',
         OPTION2: '--geofencingradius <radius>',
         DESCRIPTION: 'Set Geofencing-Radius (in m)'
+    }, {
+        OPTION2: '--race-mode',
+        DESCRIPTION: 'start with race mode'
     }, {
         OPTION: '-l <level>',
         OPTION2: '--log <level>',
@@ -490,6 +497,9 @@ function printHelp() {
         Button: 'l',
         DESCRIPTION: 'land'
     }, {
+        Button: 'return',
+        DESCRIPTION: 'stop drone and deactivate all cotrollers'
+    }, {
         Button: 'space',
         DESCRIPTION: 'emergency'
     }, {
@@ -505,11 +515,14 @@ function printHelp() {
         Button: 'd',
         DESCRIPTION: 'move right'
     }, {
-        Button: 'e',
+        Button: 'e / up',
         DESCRIPTION: 'rise'
     }, {
-        Button: 'q',
+        Button: 'q / down',
         DESCRIPTION: 'sink'
+    }, {
+        Button: 'r',
+        DESCRIPTION: 'activate/deactivate race'
     }, {
         Button: '1',
         DESCRIPTION: 'activate/deactivate gamepad'
@@ -543,14 +556,11 @@ function printHelp() {
 
     console.log("Assignment of controller keys:\n");
     console.table([{
-        Button: 'XBOX',
-        DESCRIPTION: 'emergency'
-    }, {
         Button: 'back',
-        DESCRIPTION: 'return to home'
+        DESCRIPTION: 'take picture'
     }, {
         Button: 'start',
-        DESCRIPTION: ''
+        DESCRIPTION: 'start/stop video'
     }, {
         Button: 'A',
         DESCRIPTION: 'takeoff'
@@ -576,11 +586,11 @@ function printHelp() {
         Button: 'RT',
         DESCRIPTION: 'sink'
     }, {
-        Button: 'press left stick',
-        DESCRIPTION: 'activate balance board'
+        Button: 'left stick',
+        DESCRIPTION: 'forward/back/left/right'
     }, {
-        Button: 'press right stick',
-        DESCRIPTION: 'deactivate balance board'
+        Button: 'right stick',
+        DESCRIPTION: 'rot. left / rot. right'
     }]);
     console.log("\n");
 
