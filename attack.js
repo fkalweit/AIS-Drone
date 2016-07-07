@@ -67,7 +67,6 @@ Gamepad.on("move", function(id, axis, value) {
               //r.drone.hover();
             }
             break;
-
           case 1:
             if (value > 0.01) {
               value = Math.round(value * 100);
@@ -81,21 +80,6 @@ Gamepad.on("move", function(id, axis, value) {
               //r.drone.stop();
             }
             break;
-
-          case 2:
-            if (value > 0.01) {
-              value = Math.round(value * 100);
-              log.debug("sinking down by: " + value);
-              r.down(value);
-            } else if (value < -0.01) {
-              value = Math.round(value * -100);
-              log.debug("lifting up by: " + value);
-              r.up(value);
-            } else {
-              //r.drone.stop();
-            }
-            break;
-
           default:
             {}
         }
@@ -113,68 +97,57 @@ Gamepad.on("down", function(id, num) {
       try {
         switch (num) {
           case 0:
-            log.debug("takeoff!");
-            r.takeOff();
-            // if (Main.getRaceStatus()) {
-            //   Main.startTakeTime(1);
-            // }
-            break;
-
-          case 1:
             log.debug("hovering...");
             r.stop();
             break;
-
+          case 1:
+            log.debug("down...");
+            r.down(50);
+            break;
           case 2:
-            log.debug("landing...");
-            r.land();
-            // if (Main.getRaceStatus()) {
-            //   Main.stopTakeTime();
-            // }
+            log.debug("up...");
+            r.up(50);
             break;
-
           case 3:
-            log.debug("clockwise -> 20");
-            r.clockwise(20);
-            break;
-
-          case 4:
             log.debug("counterclockwise -> 20");
-            r.counterClockwise(20);
+            r.counterClockwise(50);
             break;
-
+          case 4:
+            log.debug("clockwise -> 20");
+            r.clockwise(50);
+            break;
           case 5:
+            log.info("landing!");
+            r.land();
+            if (Main.getRaceStatus()) {
+              Main.stopTakeTime();
+            }
+            break;
+          case 6:
+            log.info("take off!");
+            r.takeoff();
+            if (Main.getRaceStatus()) {
+              Main.startTakeTime(1);
+            }
+            break;
+          case 7:
             log.debug("taking picture");
             r.takePicture();
             break;
-
-          case 6:
-            log.debug("EMERGENCY!");
-            r.emergency();
-            break;
-
-          case 7:
-            log.debug("frontflip...");
-            r.frontFlip();
-            break;
-
           case 8:
-            log.debug("backflip...");
-            r.backFlip();
+            log.debug("Video...");
+            Drone.toggleVideoRecording();
             break;
-
           case 9:
-            log.debug("startRecording...");
-            r.startRecording();
+            log.debug("back flip...");
+            r.backflip();
             break;
-
           case 10:
-            log.debug("stopRecording...");
-            r.stopRecording();
-            break;
-
+            log.debug("front flip...");
+            r.frontflip();
+            break
           default:
-            r.emergency();
+            r.stop();
         }
       } catch (e) {
         r.land();
@@ -203,7 +176,6 @@ Gamepad.on("remove", function(id, num) {
       connected = true;
     }
   }
-
   for (var i = 0, l = Gamepad.numDevices(); i < l; i++) {
     log.debug(i, Gamepad.deviceAtIndex(i));
   }
@@ -225,14 +197,29 @@ Gamepad.on("remove", function(id, num) {
     }
   }
 });
-
-
 // Listen for button down events on all Gamepads
-Gamepad.on("down", function(id, num) {
+Gamepad.on("up", function(id, num) {
   if (checkIfAttack(id)) {
-    log.debug("down", {
-      id: id,
-      num: num,
-    });
+    if (!Drone.isConnected()) {
+      console.fatal("No Drone-Connection");
+    } else {
+      try {
+        switch (num) {
+          case 3:
+            log.debug("counterclockwise -> 0");
+            r.counterClockwise(0);
+            break;
+          case 4:
+            log.debug("clockwise -> 0");
+            r.clockwise(0);
+            break;
+          default:
+            {}
+        }
+      } catch (e) {
+        r.land();
+        log.error("Landing because of Exception");
+      }
+    }
   }
 });
