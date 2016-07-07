@@ -290,7 +290,7 @@ setTimeout(function() {
 
 setTimeout(function() {
       //DEFAULT: start xbox with ui without log + no stream
-      if (Drone.isConnected()) {
+      if (!Drone.isConnected()) {
         log.fatal("No Drone-Connection");
         var CLI = require('clui'),
           Spinner = CLI.Spinner;
@@ -345,8 +345,8 @@ function printGUI() {
         if (Drone.isConnected()) {
           var droneConnection =String(Drone.isConnected()).green
         }else {
-          var droneConnection = "true".green;
-          //var droneConnection = String(Drone.isConnected()).red
+          //var droneConnection = "true".green;
+          var droneConnection = String(Drone.isConnected()).red
         }
         if (raceModeActive) {
           var raceMode =  String(raceModeActive).green //+  String(raceModeActive).green

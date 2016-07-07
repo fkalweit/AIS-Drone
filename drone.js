@@ -103,7 +103,7 @@ drone.connect(function() {
 
               //OutOfAreaContextState = "unknown";
 
-              if (isOutOfArea AND !wasOutOfArea) {
+              if (isOutOfArea && !wasOutOfArea) {
 
                 log.info("Drone leaves Area");
                 OutOfAreaContextState = "Drone is out of area";
@@ -112,7 +112,7 @@ drone.connect(function() {
                 drone.stop();
                 wasOutOfArea = true;
 
-              }else if (!isOutOfArea AND wasOutOfArea) {
+              }else if (!isOutOfArea && wasOutOfArea) {
                 log.info("Drone enters Area");
                 OutOfAreaContextState = "Drone is in area";
                 wasOutOfArea = false;
