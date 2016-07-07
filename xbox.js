@@ -3,17 +3,11 @@ var Drone = require('./drone');
 var Gamepad = require("gamepad");
 var Main = require('./main');
 
-var mjpgStream = false;
-
 var connected = false;
 
 module.exports = {
   isConnected: function() {
       return connected;
-  },
-  start_stream: function(value) {
-    log.info("start stream");
-    mjpgStream = value;
   },
   setDrone: function(value) {
     r = value;
@@ -121,7 +115,7 @@ Gamepad.on("move", function(id, axis, value) {
       if ((Math.abs(Axis3LastValue) < deadZoneGamepad)) {
         log.debug("rotation stop!");
         r.clockwise(0);
-        //r.counterClockwise(0);
+        r.counterClockwise(0);
       }
     }
 
@@ -155,8 +149,10 @@ Gamepad.on("down", function(id, num) {
             }
             break;
           case 1:
-            log.debug("reset Home to current Position");
-            Drone.setCurrentPositionToHome();
+            if(Main.getRaceStatus()){
+              log.debug("reset Home to current Position");
+              Drone.setCurrentPositionToHome();
+            }
             break;
           case 2:
             log.debug("hovering...");
@@ -178,14 +174,19 @@ Gamepad.on("down", function(id, num) {
             r.clockwise(50);
             break;
           case 6:
-            log.debug("returning Home...home...sweet home");
-            r.Piloting.navigateHome(1);
+            //log.debug("returning Home...home...sweet home");
+            //r.Piloting.navigateHome(1);
             break;
           case 7:
-            log.debug("aborted flying home...");
-            r.Piloting.navigateHome(0);
+            //log.debug("aborted flying home...");
+            //r.Piloting.navigateHome(0);
+            break;
+          case 8:
+            Drone.toggleVideoRecording();
             break;
           case 9:
+            log.debug("TAKING PICTURE");
+            r.takePicture();
             break;
           case 10:
             break;
@@ -266,8 +267,6 @@ Gamepad.on("remove", function(id, num) {
 		  } else {
 		    try {
 		      log.debug("Hovering ... no Controller");
-		      //console.log("STOPPPPPPPPPPPPPP");
-		      //r.land();
 		      r.stop();
 		    } catch (e) {
 		      r.stop();
@@ -275,52 +274,4 @@ Gamepad.on("remove", function(id, num) {
 		    }
 		  }
   }
-});
-
-
-setTimeout(function() {
-  if (mjpgStream) {
-    console.log(mjpgStream);
-    var cv = require("opencv");
-
-    var mjpg = r.getMjpegStream(),
-      buf = null,
-      w = new cv.NamedWindow("Video", 0);
-
-    mjpg.on("data", function(data) {
-      buf = data;
-    });
-
-    setInterval(function() {
-      if (buf == null) {
-        return;
-      }
-
-      try {
-        cv.readImage(buf, function(err, im) {
-          if (err) {
-            log.error(err);
-          } else {
-            if (im.width() < 1 || im.height() < 1) {
-              log.info("no width or height");
-              return;
-            }
-            w.show(im);
-            w.blockingWaitKey(0, 50);
-          }
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }, 80);
-  }
-}, 1000);
-// Listen for button down events on all Gamepads
-Gamepad.on("down", function(id, num) {
-    if (Main.isControllerActivated()) {
-        console.log("down", {
-            id: id,
-            num: num,
-        });
-    }
 });
