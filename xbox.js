@@ -192,15 +192,19 @@ Gamepad.on("down", function(id, num) {
                         case 10:
                             break;
                         case 11:
+                            log.info("JUHU...... HUI....");
                             r.leftFlip();
                             break;
                         case 12:
+                            log.info("WOW..... HUI....");
                             r.rightFlip();
                             break;
                         case 13:
+                            log.info("WOW..... HUI....");
                             r.frontFlip();
                             break;
                         case 14:
+                            log.info("WOW..... HUI....");
                             r.backFlip();
                             break;
                         default:
