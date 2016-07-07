@@ -101,6 +101,7 @@ Gamepad.on("down", function(id, num) {
             r.stop();
             break;
           case 1:
+            //TODO ?????
             log.debug("down...");
             r.down(50);
             break;
@@ -204,7 +205,14 @@ Gamepad.on("up", function(id, num) {
       console.fatal("No Drone-Connection");
     } else {
       try {
+        //TODO ?????
         switch (num) {
+          case 1:
+            r.down(0);
+            break;
+          case 2:
+            r.up(0);
+            break;
           case 3:
             log.debug("counterclockwise -> 0");
             r.counterClockwise(0);
