@@ -144,9 +144,9 @@ Gamepad.on("down", function(id, num) {
                         case 0:
                             log.debug("takeoff!");
                             r.takeOff();
-                            if (Main.getRaceStatus()) {
-                                Main.startTakeTime(0);
-                            }
+                            //if (Main.getRaceStatus()) {
+                            //    Main.startTakeTime(0);
+                            //}
                             break;
                         case 1:
                             if (Main.getRaceStatus()) {
@@ -161,9 +161,9 @@ Gamepad.on("down", function(id, num) {
                         case 3:
                             log.debug("landing...");
                             r.land();
-                            if (Main.getRaceStatus()) {
-                                Main.stopTakeTime();
-                            }
+                            // if (Main.getRaceStatus()) {
+                            //     Main.stopTakeTime();
+                            // }
                             break;
                         case 4:
                             log.debug("counterclockwise -> 50");
