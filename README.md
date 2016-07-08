@@ -17,7 +17,7 @@ Sofern NodeJS installiert wurde und eine Internetverbindung existiert, werden nu
 
 
 Sollte die Installation von OpenCV fehlschlagen, kann dies "manuell" nachinstalliert werden. 
-OpenCV wird für den MPEG Stream der Applikation benutzt. Hierfür bieten sich die automatischen Installationsscripts des GitHub Benutzers jayrambhia an, welche für verschiedene Linuxdistributionen und OpenCV Versionen existieren (https://github.com/jayrambhia/Install-OpenCV). 
+Hierfür bieten sich die automatischen Installationsscripts des GitHub Benutzers jayrambhia an, welche für verschiedene Linuxdistributionen und OpenCV Versionen existieren (https://github.com/jayrambhia/Install-OpenCV). 
 
 WICHTIG: Installieren Sie eine OpenCV Version mit einer Versionsnummer <=  2.4.10, da die Installation des benötigten Moduls sonst fehlschlägt.
 
