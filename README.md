@@ -2,52 +2,67 @@
 Game of Drones - HS KL Seminar
 
 
-
 ## Installation ##
-1. Klone das git-Repo ``` git clone https://github.com/fog1992/AIS-Drone.git ``` 
-   oder lade die Zip-Datei
-2. Den Ordner 'AIS-Drone' öffnen ``` cd AIS-Drone ```
-3. Installation der benötigten Pakete: ``` npm install ```
 
-Node-Version: 4.4.4
+
+Vor der Installation muss zunächst NodeJS installiert werden. Nutzen Sie hierzu den Download auf der offiziellen Website (https://nodejs.org/en/)
+
+
+Zur Installation muss das Projektverzeichnis aus dem GitHub Repository (https://github.com/fog1992/AIS-Drone) heruntergeladen werden. Öffnen Sie anschließend ein Terminal und navigieren Sie zu besagtem Projektverzeichnis. Starten Sie die Einrichtung des Programms nun mit folgendem Befehl.
+
+```npm install```
+
+
+Sofern NodeJS installiert wurde und eine Internetverbindung existiert, werden nun alle benötigten Module automatisch installiert. Kommt bei der OpenCV Installation eine Fehlermeldung  kann die Anwendung dennoch mit Ausnahme des MPEG Streams vollständig genutzt werden.
+
+
+Sollte die Installation von OpenCV fehlschlagen, kann dies "manuell" nachinstalliert werden. 
+OpenCV wird für den MPEG Stream der Applikation benutzt. Hierfür bieten sich die automatischen Installationsscripts des GitHub Benutzers jayrambhia an, welche für verschiedene Linuxdistributionen und OpenCV Versionen existieren (https://github.com/jayrambhia/Install-OpenCV). 
+
+WICHTIG: Installieren Sie eine OpenCV Version mit einer Versionsnummer <=  2.4.10, da die Installation des benötigten Moduls sonst fehlschlägt.
 
 ## Starten der Anwendung ##
 Die Anwendung kann mit ```npm start``` oder durch Aufrufen von ```node main.js [OPTION]``` gestartet werden.
-Per Default wird der die Tastatur zum Steuern benutzt und auf der Console werden dem Benutzer die wichtigsten Informationen angezeigt. Mit den Tasten '1' und '2' können weitere Geräte zum Steuern aktiviert werden. Das Hilfemenü wird mit der Option --help oder -? angezeigt:
+Per Default wird der die Tastatur zum Steuern benutzt und auf der Konsole werden dem Benutzer die wichtigsten Informationen angezeigt. Mit den Tasten '1', '2' und '3' können weitere Geräte zum Steuern aktiviert werden. Das Hilfemenü wird mit der Option --help oder -? angezeigt:
 
-![screenshot 2](https://cloud.githubusercontent.com/assets/9308836/16233372/67055744-37ce-11e6-8361-48a1d9a53fc7.jpg)
+| Option       |Oprion2          | Beschreibung  |
+| ------------- |:-------------:| -----:|
+|- ?      | -- help | Übersicht über alle Parameter |
+| - r <radius>      | --geofencingradius     |   Setzt Geofencing Radius (in Meter) |
+| - l <level> | --log <level>      |    Setzt Log Level (10-60) |
+|- v|--verbose|Direkte Debug Ausgaben und Unterdrückung des UI |
+||--no-ui|Unterdrückt das UI|
+|-s|--stream|Startet MPEG Stream (nur Unix mit OpenCV)|
+||--race-mode|Startet Applikation mit aktiviertem Race Mode|
 
-## Tastenbelegung ##
+Wichtig: Soll das Wii Balance Board genutzt werden, so muss in einem kurzen Zeitraum nach dem Start der Applikation der Synchronisationsbutton am Balance Board gedrückt werden. Dieser befindet sich innerhalb des Batteriefachs an der unteren Seite des Balance Boards. Beim Versuch der Verbindung blinkt die LED des Buttons am Rand des Boards blau. Die Verbindung ist dann hergestellt, wenn der Button dauerhaft blau leuchtet. Schlägt die Verbindung fehl und soll das Balance Board dennoch genutzt werden, muss die Hauptanwendung zunächst gestoppt werden und der Verbindungsversuch beim erneuten Start ein zweites Mal versucht werden. 
+
+Das Balance Board muss vor der Nutzung zunächst kalibriert werden. Dieser Vorgang wird automatisch bei der ersten Aktivierung (Taste „5“ auf der Tastatur) des Boards aktiviert. Hierbei muss ein Nutzer auf dem Board sich in die Richtung lehnen, die von der  Hauptapplikation vorgegeben wird.
+
+
+## Bedienung ##
+
+Das Programm ist als Konsolenapplikation konzipiert. Diese stellt die zentrale Verwaltungseinheit dar. Der Benutzer hat ständig im Blick, welche Peripheriegeräte angeschlossen und gerade aktiviert sind. Zudem erhält er Informationen über den Status der Drohne wie z.B. den Akkustand und den aktuellen Flugstatus.
+Die Drohne kann vollständig über die Tastatur gesteuert werden. Dies hat hauptsächlich sicherheitstechnische Gründe und ist dazu gedacht, um z.B. bei Kontrollverlust eines der Peripheriegeräte über die Drohne jederzeit eingreifen zu können.
+Hier kann zudem der Racing Modus aktiviert werden. Hierbei können für alle drei angebundenen Peripheriegeräte Zeitmessungen zur Absolvierung eines zuvor festgelegten Parcours durchgeführt werden.
+
+![screenshot 6](https://cloud.githubusercontent.com/assets/9308836/16701880/05446354-4563-11e6-9bd9-471311c08627.jpg)
+
+## Tastenbelegung
+
 ### Keyboard ###
+
 ![keyboard](https://cloud.githubusercontent.com/assets/9308836/16232917/b10345ec-37cc-11e6-8957-83d4ee869502.png)
+
 ### Xbox ###
-![xbox-default](xbox-default.png)
 
-## Code Infos ##
-Die Node Anwendung ist Komponentenweise aufgebaut. Um eine Komponente in einer anderen zu benutzen einfach require(./name) (ohne .js) verwenden, dann steht alles im Module-Exports-Block zur Verfügung.
+![screenshot 8](https://cloud.githubusercontent.com/assets/9308836/16701679/97f86422-4561-11e6-915c-c6c26470ed24.jpg)
 
-### Beispiel:
+### ATK3 ###
 
-keyboard.js:
+![screenshot 9](https://cloud.githubusercontent.com/assets/9308836/16701681/9f51270e-4561-11e6-8e9f-c1b1ffe25bec.jpg)
 
-```javascript
-require('./drone');
-var d = Drone.getAndActivateDrone();
-```
 
-drone.js:
-
-```javascript
-module.exports = {
-  getAndActivateDrone: function () {
-    if(!started){
-      d.start();
-      started = true;
-    }
-    return d;
-  }
-};
-```
 
 ###License###
 
