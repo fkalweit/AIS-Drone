@@ -52,7 +52,7 @@ Hier kann zudem der Racing Modus aktiviert werden. Hierbei können für alle dre
 
 ### Keyboard ###
 
-![keyboard](https://cloud.githubusercontent.com/assets/9308836/16702207/d539f852-4564-11e6-9840-fc26d317c9dd.
+![keyboard](https://cloud.githubusercontent.com/assets/9308836/16702207/d539f852-4564-11e6-9840-fc26d317c9dd.png)
 
 ### Xbox ###
 
