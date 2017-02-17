@@ -23,7 +23,7 @@ WICHTIG: Installieren Sie eine OpenCV Version mit einer Versionsnummer <=  2.4.1
 
 ## Starten der Anwendung ##
 Die Anwendung kann mit ```npm start``` oder durch Aufrufen von ```node main.js [OPTION]``` gestartet werden.
-Per Default wird der die Tastatur zum Steuern benutzt und auf der Konsole werden dem Benutzer die wichtigsten Informationen angezeigt. Mit den Tasten '1', '2' und '3' können weitere Geräte zum Steuern aktiviert werden. Das Hilfemenü wird mit der Option --help oder -? angezeigt:
+Per Default wird die Tastatur zum Steuern benutzt und auf der Konsole werden dem Benutzer die wichtigsten Informationen angezeigt. Mit den Tasten '1', '2' und '3' können weitere Geräte zum Steuern aktiviert werden. Das Hilfemenü wird mit der Option --help oder -? angezeigt:
 
 | Option       |Oprion2          | Beschreibung  |
 | ------------- |:-------------:| -----:|
