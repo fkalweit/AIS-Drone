@@ -37,7 +37,7 @@ Per Default wird die Tastatur zum Steuern benutzt und auf der Konsole werden dem
 
 Wichtig: Soll das Wii Balance Board genutzt werden, so muss in einem kurzen Zeitraum nach dem Start der Applikation der Synchronisationsbutton am Balance Board gedrückt werden. Dieser befindet sich innerhalb des Batteriefachs an der unteren Seite des Balance Boards. Beim Versuch der Verbindung blinkt die LED des Buttons am Rand des Boards blau. Die Verbindung ist dann hergestellt, wenn der Button dauerhaft blau leuchtet. Schlägt die Verbindung fehl und soll das Balance Board dennoch genutzt werden, muss die Hauptanwendung zunächst gestoppt werden und der Verbindungsversuch beim erneuten Start ein zweites Mal versucht werden. 
 
-Das Balance Board muss vor der Nutzung zunächst kalibriert werden. Dieser Vorgang wird automatisch bei der ersten Aktivierung (Taste „5“ auf der Tastatur) des Boards aktiviert. Hierbei muss ein Nutzer auf dem Board sich in die Richtung lehnen, die von der  Hauptapplikation vorgegeben wird.
+Das Balance Board muss vor der Nutzung zunächst kalibriert werden. Dieser Vorgang wird automatisch bei der ersten Aktivierung (Taste „3“ auf der Tastatur) des Boards aktiviert. Hierbei muss ein Nutzer auf dem Board sich in die Richtung lehnen, die von der  Hauptapplikation vorgegeben wird.
 
 
 ## Bedienung ##
